@@ -4,10 +4,10 @@
 #include <Smartcar.h>
 #include "constants.h"
 
-// constants within this class (might need to be replaced with variables at some point)
-#define SPEED         100
-#define STOP_SPEED    0
-#define SAFETY_DIST   25      // not yet intended as the global standard - move to constants.h if it becomes that
+// constants within this file (might need to be replaced with variables at some point)
+const int SPEED = 100;
+const int STOP_SPEED = 0;
+const int SAFETY_DIST = 25; // not yet intended as the global standard - move to constants.h if it becomes that
 
 // instantiate the front ultra sound sensor
 SR04 front(US_TRIGGER_PIN, US_ECHO_PIN, US_MAX_DISTANCE);
