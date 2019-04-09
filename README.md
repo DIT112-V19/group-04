@@ -11,7 +11,7 @@ This could potentially reduce the number of vehicles needed as people could in p
 ## How?
 The vehicle will be based on the Smartcar shield platform which can be viewed here.
 * [The Smartcar platform](http://plat.is/smartcar)
-
+ 
 ## Software:
 * Android Studio
 * Arduino IDE
