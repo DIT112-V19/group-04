@@ -19,5 +19,7 @@ class Vector:
     def calculateDirection(self):
         # flipped x and y instead of subtracting pi/2
         direction = math.atan2(self.x, self.y)
+        if direction < 0:
+            direction += 2*math.pi
 
         return math.degrees(direction)
