@@ -17,10 +17,7 @@ class Vector:
         return magnitude
 
     def calculateDirection(self):
-        direction = math.atan2(self.y, self.x)
+        # flipped x and y instead of subtracting pi/2
+        direction = math.atan2(self.x, self.y)
 
-        return direction
-
-    def info(self):
-
-        return self.direction
+        return math.degrees(direction)
