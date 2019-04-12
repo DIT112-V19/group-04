@@ -21,4 +21,4 @@ Please describe the tests that you ran to verify your changes. Please also note 
 - [ ] I have made corresponding changes to the documentation
 - [ ] My changes generate no new warnings
 
-[//]: # Template copied from [embeddedartistry](https://github.com/embeddedartistry/templates/edit/master/.github/PULL_REQUEST_TEMPLATE.md) on github
+<!-- Template copied from [embeddedartistry](https://github.com/embeddedartistry/templates/edit/master/.github/PULL_REQUEST_TEMPLATE.md) on github-->
