@@ -16,7 +16,11 @@ The vehicle will be based on the Smartcar shield platform which can be viewed he
 To be able to run the server you need the following:
 
 * Python 3 or newer
-* Flask
+* Virtualenv
+
+`virtualenv venv`
+`source venv/bin/activate`
+`pip install -r requirements.txt`
 
 In order to temporarily forward your port and make it accessible for other devices, we can use <a href="https://serveo.net/"> this service </a>:
 
