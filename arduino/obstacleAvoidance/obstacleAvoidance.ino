@@ -3,6 +3,7 @@
 
 #include <Smartcar.h>
 #include "constants.h"
+#include <SoftwareSerial.h>
 
 // constants within this file (might need to be replaced with variables at some point)
 const int SPEED = 100;
@@ -18,13 +19,12 @@ BrushedMotor rightMotor(BRUSHED_RIGHT_FORWARD_PIN, BRUSHED_RIGHT_BACKWARD_PIN, B
 DifferentialControl control(leftMotor, rightMotor);
 SimpleCar car(control);
 
+char c;
+int speed = STOP_SPEED;
 
 void setup() {
   // initialize serial communication
   Serial.begin(BAUD_RATE);
-
-  // set initial speed of the car
-  car.setSpeed(SPEED);
 }
 
 void loop() {
@@ -33,5 +33,12 @@ void loop() {
   // stop car if necessary to avoid collision
   if (dist < SAFETY_DIST && dist > 0) {
     car.setSpeed(STOP_SPEED);
+  } else if (Serial.available()) {
+    c = Serial.read();
+    // set initial speed of the car
+    if (c == 'M') {
+      speed = (speed == STOP_SPEED) ? SPEED : STOP_SPEED;    
+      car.setSpeed(speed);      
+    }
   }
 }

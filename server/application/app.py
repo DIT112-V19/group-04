@@ -1,5 +1,8 @@
 from flask import Flask
+from server.bluetooth.serial_connection import SerialConnection
+
 app = Flask(__name__)
+connection = SerialConnection(conn_type='usb')
 
 @app.route('/')
 def index():
@@ -7,7 +10,8 @@ def index():
 
 @app.route('/move')
 def move():
-    #TODO: Make our car move
+    cmd = "M"
+    connection.write(cmd)
     return "We will make the car move"
 
 
