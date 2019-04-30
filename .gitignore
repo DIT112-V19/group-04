@@ -1,1 +1,3 @@
 server/venv/
+.directory
+__pycache__
