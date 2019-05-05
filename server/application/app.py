@@ -1,5 +1,8 @@
 from flask import Flask, request, jsonify
+from server.bluetooth.serial_connection import SerialConnection
+
 app = Flask(__name__)
+connection = SerialConnection(conn_type='usb')
 
 @app.route('/')
 def index():
@@ -20,14 +23,11 @@ def go_distance():
     print("We received a end position from a user: " + str(end_cordinates))
     return jsonify({"startPosition": start_cordinates, "endPosition": end_cordinates}), 200
 
-
-
-
 @app.route('/move')
 def move():
-    #TODO: Make our car move
+    cmd = "M"
+    connection.write(cmd)
     return "We will make the car move"
-
 
 app.run(host='0.0.0.0', port=5000, debug=True)
 

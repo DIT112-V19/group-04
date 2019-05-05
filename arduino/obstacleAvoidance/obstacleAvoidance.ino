@@ -3,9 +3,10 @@
 
 #include <Smartcar.h>
 #include "constants.h"
+#include <SoftwareSerial.h>
 
 // constants within this file (might need to be replaced with variables at some point)
-const int SPEED = 100;
+const int SPEED = 25;
 const int STOP_SPEED = 0;
 const int SAFETY_DIST = 25; // not yet intended as the global standard - move to constants.h if it becomes that
 
@@ -18,20 +19,56 @@ BrushedMotor rightMotor(BRUSHED_RIGHT_FORWARD_PIN, BRUSHED_RIGHT_BACKWARD_PIN, B
 DifferentialControl control(leftMotor, rightMotor);
 SimpleCar car(control);
 
+char c;
+int speed = STOP_SPEED;
+
+String buffer = "";
+
+HardwareSerial connection = Serial1;
 
 void setup() {
   // initialize serial communication
-  Serial.begin(BAUD_RATE);
+  connection.begin(BAUD_RATE);
+}
 
-  // set initial speed of the car
-  car.setSpeed(SPEED);
+void readCommand(String command) {
+  if (command == "MOVE") {
+    car.setSpeed(SPEED);
+  } else if (command == "STOP") {
+    car.setSpeed(STOP_SPEED);
+  }
+}
+
+
+void readSerial() {
+  while (connection.available() > 0) {
+    char received = connection.read();
+    if (received == '\n') {
+      readCommand(buffer);
+      buffer = "";
+    } else {
+      buffer += received;  
+    }      
+  }  
 }
 
 void loop() {
+  readSerial();
+  
   int dist = front.getDistance();   // read front distance
   
   // stop car if necessary to avoid collision
   if (dist < SAFETY_DIST && dist > 0) {
-    car.setSpeed(STOP_SPEED);
+    speed = STOP_SPEED;
+    car.setSpeed(speed);
   }
+  /*else if (connection.available()) {
+    c = connection.read();
+    // set initial speed of the car
+    if (c == 'M') {
+      speed = (speed == STOP_SPEED) ? SPEED : STOP_SPEED;    
+      car.setSpeed(speed); 
+      //Serial1.println(speed);        
+    }
+  }*/
 }
