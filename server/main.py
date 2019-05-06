@@ -2,15 +2,17 @@ from flask import Flask, request, jsonify
 from bluetooth.serial_connection import SerialConnection
 
 app = Flask(__name__)
-connection = SerialConnection(conn_type='usb')
+connection = SerialConnection(connection_type='usb')
+
 
 @app.route('/')
 def index():
     return "Welcome to group-04 car sharing service"
 
+
 @app.route('/distance', methods=['POST'])
 def go_distance():
-    #Example request of when a user wants to gos omewhere, parsing start and end position
+    # Example request of when a user wants to gos somewhere, parsing start and end position
     data = request.json
 
     try:
@@ -31,4 +33,6 @@ def move():
     return "We will make the car move"
 
 
-app.run(host='0.0.0.0', port=5000, debug=True)
+# Makes sure the following only gets executed once
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)

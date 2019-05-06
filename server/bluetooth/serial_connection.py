@@ -1,39 +1,23 @@
 from serial import Serial
 from bluetooth import module_config, host_pc
 
-conn_types = ['bluetooth', 'usb']
-default_type = conn_types[0]
-
 
 class SerialConnection(Serial):
-    """Class to establish a serial connection to the SmartCar.
+    # Class to establish a serial connection to the SmartCar and transmit & receive data
 
-    Serial connection to transmit and receive data
-    """
+    def __init__(self, connection_type='bluetooth'):
 
-    def __init__(self, conn_type=default_type):
-        """Initialises a serial connection to the SmartCar using either bluetooth or usb.
-
-        Parameters
-        -----------
-        conn_type : str
-            the connection type of the serial connection
-            default : bluetooth
-        """
-
-        # super().__init__(**kwargs)
-        if conn_type not in conn_types:
-            conn_type = default_type
+        if connection_type not in ['bluetooth', 'usb']:
+            raise Exception('Connection type \'' + connection_type + '\' is not supported')
 
         self.serial_settings = module_config['serial_port'][host_pc]
-        self.Serial = Serial(self.serial_settings[conn_type])
+        self.Serial = Serial(self.serial_settings[connection_type])
         self.Serial.reset_input_buffer()    # disregard everything sent before the connection has benn established
-
-        print("SerialConnection initialised using", conn_type)
+        print("SerialConnection initialised using", connection_type)
 
     def read(self):
         return self.Serial.read()
 
     def write(self, msg):
-        """Transmit messages using the serial connection. Encodes strings to byte-arrays"""
+        # Transmit messages using the serial connection. Encodes strings to byte-arrays
         self.Serial.write(msg.encode('ascii'))
