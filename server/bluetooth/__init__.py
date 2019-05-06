@@ -1,7 +1,7 @@
 """Load the config file into the module"""
 
-from os import path
-from server.confighandler import yamlparser
+from os import path 
+import yamlparser
 import platform
 
 module_dir = path.dirname(__file__)     # <-- absolute directory of the module
