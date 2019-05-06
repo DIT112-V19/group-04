@@ -10,7 +10,7 @@ class SerialConnection(Serial):
         if connection_type not in ['bluetooth', 'usb']:
             raise Exception('Connection type \'' + connection_type + '\' is not supported')
 
-        self.serial_settings = module_config['serial_port'][host_pc]
+        self.serial_settings = module_config['computers'][host_pc]
         self.Serial = Serial(self.serial_settings[connection_type])
         self.Serial.reset_input_buffer()    # disregard everything sent before the connection has benn established
         print("SerialConnection initialised using", connection_type)

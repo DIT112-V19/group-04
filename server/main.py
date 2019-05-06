@@ -12,7 +12,7 @@ def index():
 
 @app.route('/distance', methods=['POST'])
 def go_distance():
-    # Example request of when a user wants to gos somewhere, parsing start and end position
+    # Example request of when a user wants to go somewhere, parsing start and end position
     data = request.json
 
     try:
