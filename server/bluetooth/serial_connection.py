@@ -1,5 +1,5 @@
 from serial import Serial
-from server.bluetooth import module_config, host_pc
+from bluetooth import module_config, host_pc
 
 conn_types = ['bluetooth', 'usb']
 default_type = conn_types[0]
@@ -37,12 +37,3 @@ class SerialConnection(Serial):
     def write(self, msg):
         """Transmit messages using the serial connection. Encodes strings to byte-arrays"""
         self.Serial.write(msg.encode('ascii'))
-
-
-# Test a connection
-# TODO move this part to testing
-"""
-conn = SerialConnection(conn_types[1])
-print(conn.read())
-conn.write('move')
-print(conn.read())"""

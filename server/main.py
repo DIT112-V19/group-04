@@ -1,5 +1,5 @@
-from flask import Flask
-from server.bluetooth.serial_connection import SerialConnection
+from flask import Flask, request, jsonify
+from bluetooth.serial_connection import SerialConnection
 
 app = Flask(__name__)
 connection = SerialConnection(conn_type='usb')
