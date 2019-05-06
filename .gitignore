@@ -1,3 +1,4 @@
 server/venv/
 .directory
 __pycache__
+.idea
