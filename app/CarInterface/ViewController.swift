@@ -16,7 +16,7 @@ fileprivate let MERCATOR_RADIUS: Double = 85445659.44705395
 class ViewController: UIViewController {
 
     @IBOutlet weak var rButton: UIButton!
-    @IBOutlet weak var imageView: UIImageView!
+    @IBOutlet weak var cButton: UIButton!
     @IBOutlet weak var mapView: MKMapView!
     private final let SERVER_URL = "https://carpool.serveo.net/"
     private final let MOVE_ENDPOINT = "move"
@@ -29,7 +29,6 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         checkLocationServices()
         mapView.delegate = self
-        
         let singleTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(longTap))
         singleTapRecognizer.delegate = self
         mapView.addGestureRecognizer(singleTapRecognizer)
@@ -39,6 +38,9 @@ class ViewController: UIViewController {
     }
 
     
+    @IBAction func cButtonTapped(_ sender: Any) {
+        clearView()
+    }
     
     @IBAction func rButtonTapped(_ sender: Any) {
         initLindHolmenMap()
@@ -113,12 +115,13 @@ class ViewController: UIViewController {
     }
     
     
+   
+    
     func showCompass() {
         mapView.showsCompass = false
         let comapssButton = MKCompassButton(mapView:mapView)
         comapssButton.compassVisibility = .visible
         mapView.addSubview(comapssButton)
-        
         comapssButton.translatesAutoresizingMaskIntoConstraints = false
         comapssButton.leftAnchor.constraint(equalTo: mapView.leftAnchor, constant: 15).isActive = true
         comapssButton.topAnchor.constraint(equalTo: mapView.topAnchor, constant: 25).isActive = true
@@ -138,18 +141,26 @@ class ViewController: UIViewController {
     
     
     func initLindHolmenMap(){
-        let lindHolmenLoc = CLLocation(latitude: 57.708604, longitude: 11.938750)
-        let regionRadius = CLLocationDistance(exactly: 1200)!
-        let linHolmenRegion = MKCoordinateRegion(center:lindHolmenLoc.coordinate, latitudinalMeters: regionRadius
-                , longitudinalMeters: regionRadius)
-        let edgeInsets = UIEdgeInsets(top: 15, left: 15, bottom: 15, right: 15);
-        mapView.setVisibleMapRect(MKMapRectForCoordinateRegion(region: linHolmenRegion), edgePadding: edgeInsets, animated: true)
+//        let lindHolmenLoc = CLLocation(latitude: 57.708604, longitude: 11.938750)
+//        let regionRadius = CLLocationDistance(exactly: 500)!
+       // let linHolmenRegion = MKCoordinateRegion(center:lindHolmenLoc.coordinate, latitudinalMeters: regionRadius
+               // , longitudinalMeters: regionRadius)
         
+        let edgeInsets = UIEdgeInsets(top: 15, left: 15, bottom: 15, right: 15);
+        mapView.setVisibleMapRect(MKMapRect(origin: MKMapPoint(x: 143107759.322694, y: 81249034.49971882), size: MKMapSize(width: 26342.33046734333, height: 21744.943166062236)), edgePadding: edgeInsets, animated: true)
+        
+//        let mapCamera = mapView.camera
+//        mapCamera.heading = 65
+//        mapView.setCamera(mapCamera, animated: true)
+//
         mapView.isScrollEnabled = false
         mapView.isZoomEnabled = true
         mapView.isRotateEnabled = false
     }
     
+//
+//    MKMapRect(origin: MKMapPoint(x: 143107759.322694, y: 81249034.49971882), size: MKMapSize(width: 26342.33046734333, height: 21744.943166062236))
+//
     
     
     
@@ -157,6 +168,9 @@ class ViewController: UIViewController {
         let allAnnotations = self.mapView.annotations
         self.mapView.removeAnnotations(allAnnotations)
     }
+    
+    
+    
     
     func MKMapRectForCoordinateRegion(region:MKCoordinateRegion) -> MKMapRect {
         let topLeft = CLLocationCoordinate2D(latitude: region.center.latitude + (region.span.latitudeDelta/2), longitude: region.center.longitude - (region.span.longitudeDelta/2))
@@ -216,7 +230,7 @@ extension MKMapView {
         let span = reg.span
         let centerCoordinate = reg.center
         
-        // Get the left and right most lonitudes
+        // Get the left and right most longitudes
         let leftLongitude = centerCoordinate.longitude - (span.longitudeDelta / 2)
         let rightLongitude = centerCoordinate.longitude + (span.longitudeDelta / 2)
         let mapSizeInPixels = self.bounds.size
@@ -306,8 +320,13 @@ extension MKMapView {
 extension ViewController: MKMapViewDelegate {
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
         print("Zoom: \(mapView.getZoomLevel())")
-        if mapView.getZoomLevel() < 13 {
-            mapView.setCenter(coordinate: mapView.centerCoordinate, zoomLevel: 14, animated: true)
+        debugPrint("\(mapView.region)")
+        debugPrint("\(mapView.region.mapRect)")
+        if mapView.getZoomLevel() < 12 {
+            
+            let lindHolmenLoc = CLLocationCoordinate2D(latitude: 57.708604, longitude: 11.938750)
+            mapView.setCenter(coordinate: lindHolmenLoc, zoomLevel: 13, animated: true)
+
         }
     }
     
