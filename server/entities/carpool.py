@@ -33,7 +33,7 @@ class Carpool:
 
     def add_car(self, car):
         if isinstance(car, Car):
-            print("adding user")
+            print("adding car")
             self.users.append(car)
         else:
             print('not adding')

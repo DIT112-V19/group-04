@@ -9,19 +9,21 @@ carpool = Carpool()
 @app.route('/api/pickup', methods=['POST'])
 def pickup():
 
+    # Retrieves the cookie header and splits the string so only the value remains
     user_id = request.headers['Cookie'][3::]
+
+    # Parses the JSON payload
     location = Coordinate(request.json["location"][0], request.json["location"][1])
     destination = Coordinate(request.json["destination"][0], request.json["destination"][1])
 
+    # Finds or creates a user
     user = carpool.find_user(user_id)
     if user is None:
         user = User(user_id, location, destination)
         carpool.add_user(user)
 
+    # Updates the users location with the ones send in the JSON payload
     user.update_location(location)
-
-    carpool.print_all_users()
-    carpool.print_all_cars()
 
     return jsonify({"carLocation": carpool.find_car('real').location.json()}), 200
 
