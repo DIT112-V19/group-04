@@ -1,20 +1,24 @@
-import vector
 import math
+import numpy as np
 # START_HEADING is north
+
 START_HEADING = 0.0
 # TURN_RADIUS is an arbitrary number
 TURN_RADIUS = 0.5
 
 
-class Vehicle:
+class Car:
+    heading = START_HEADING
+    vectors = []
+    inner_angle = 0
+    coordinates = []
 
-    def __init__(self, name, coordinates):
-        self.name = name
-        self.coordinates = coordinates
-        self.heading = START_HEADING
-        self.position = self.coordinates[0]
-        self.vectors = []
-        self.inner_angle = 0
+    def __init__(self, id, location):
+        self.id = id
+        self.location = location
+
+    def __repr__(self):
+        return "Id: " + self.id + ", Location: " + self.location.to_string()
 
     def determine_turn_direction(self, new_heading):
         # turn_direction value 1 equals left turn
@@ -55,7 +59,7 @@ class Vehicle:
         while i < len(self.coordinates):
             c1 = self.coordinates[i-1]
             c2 = self.coordinates[i]
-            v1 = vector.Vector(c1, c2)
+            v1 = np.array(c1, c2)
             self.vectors.append(v1)
             i += 1
 
