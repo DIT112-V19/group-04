@@ -1,36 +1,29 @@
 from flask import Flask, request, jsonify
-from bluetooth.serial_connection import SerialConnection
+from utils.coordinate import Coordinate
+from entities import Carpool, User
 
 app = Flask(__name__)
-connection = SerialConnection(connection_type='usb')
+carpool = Carpool()
 
 
-@app.route('/')
-def index():
-    return "Welcome to group-04 car sharing service"
+@app.route('/api/pickup', methods=['POST'])
+def pickup():
 
+    user_id = request.headers['Cookie'][3::]
+    location = Coordinate(request.json["location"][0], request.json["location"][1])
+    destination = Coordinate(request.json["destination"][0], request.json["destination"][1])
 
-@app.route('/distance', methods=['POST'])
-def go_distance():
-    # Example request of when a user wants to go somewhere, parsing start and end position
-    data = request.json
+    user = carpool.find_user(user_id)
+    if user is None:
+        user = User(user_id, location, destination)
+        carpool.add_user(user)
 
-    try:
-        start_cordinates = data["startPosition"]
-        end_cordinates = data["startPosition"]
-    except:
-        return jsonify({"message": "Error parsing json"}), 400
+    user.update_location(location)
 
-    print("We received a start position from a user: " + str(start_cordinates))
-    print("We received an end position from a user: " + str(end_cordinates))
-    return jsonify({"startPosition": start_cordinates, "endPosition": end_cordinates}), 200
+    carpool.print_all_users()
+    carpool.print_all_cars()
 
-
-@app.route('/move')
-def move():
-    cmd = "M"
-    connection.write(cmd)
-    return "We will make the car move"
+    return jsonify({"carLocation": carpool.find_car('real').location.json()}), 200
 
 
 # Makes sure the following only gets executed once

@@ -1,5 +1,5 @@
 from serial import Serial
-from bluetooth import module_config, host_pc
+from utils.bluetooth import module_config, host_pc
 
 
 class SerialConnection(Serial):

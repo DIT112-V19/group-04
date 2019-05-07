@@ -89,3 +89,4 @@ class Simulator:
 
         buttons()
         root.mainloop()
+

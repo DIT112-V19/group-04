@@ -7,15 +7,18 @@ START_HEADING = 0.0
 TURN_RADIUS = 0.5
 
 
-class Vehicle:
+class Car:
     heading = START_HEADING
     vectors = []
     inner_angle = 0
+    coordinates = []
 
-    def __init__(self, name, coordinates):
-        self.name = name
-        self.coordinates = coordinates
-        self.position = self.coordinates[0]
+    def __init__(self, id, location):
+        self.id = id
+        self.location = location
+
+    def __repr__(self):
+        return "Id: " + self.id + ", Location: " + self.location.to_string()
 
     def determine_turn_direction(self, new_heading):
         # turn_direction value 1 equals left turn
