@@ -16,3 +16,11 @@
         destination: [30, 50]
     }
  
+###### Example response
+    {
+        carLocation: [
+            230,
+            800
+        ]
+    }
+ 
