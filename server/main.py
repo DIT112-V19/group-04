@@ -1,9 +1,16 @@
 from flask import Flask, request, jsonify
 from utils.coordinate import Coordinate
-from entities import Carpool, User
+from entities.carpool import Carpool
+from entities.user import User
 
 app = Flask(__name__)
 carpool = Carpool()
+
+
+@app.route('/api')
+def get_all_data():
+    # This endpoints will be used to retrieve all information about all cars and users
+    return carpool.json(), 200
 
 
 @app.route('/api/pickup', methods=['POST'])

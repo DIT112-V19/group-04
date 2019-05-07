@@ -1,5 +1,7 @@
-from entities import Car, User
-from utils import Coordinate
+from entities.car import Car
+from entities.user import User
+from utils.coordinate import Coordinate
+from flask import jsonify
 
 
 class Carpool:
@@ -60,3 +62,26 @@ class Carpool:
         print('Current cars')
         for car in self.cars:
             print(car)
+
+    def json(self):
+        cars = []
+        users = []
+
+        for car in self.cars:
+            cars.append({
+                "x": car.location.x,
+                "y": car.location.y,
+                "id": car.id
+            })
+
+        for user in self.users:
+            users.append({
+                "x": user.location.x,
+                "y": user.location.y,
+                "id": user.id
+            })
+
+        return jsonify({
+            "cars": cars,
+            "users": users
+        })
