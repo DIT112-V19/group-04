@@ -99,87 +99,104 @@ class Carpool:
         customer_vector = vector.Vector(start, destination)
 
         for v in self.cars:
-            # Find vehicles that are standing still or moving in roughly the same direction as customer vector.
+            # Rough filter to reduce the number of cars that we check
+            # Find cars that are standing still or moving in roughly the same direction as customer vector.
             # ARBITRARY_ANGLE can be tweaked for desired results.
-            if len(v.vectors) == 1:
+            if len(v.destinations) == 0:
+                # this means that the car is stationary
+                # maybe we can add some sort of distance filter
                 potential_vehicles.append(v)
 
             else:
-                angle_difference = math.fabs(v.vectors[0].direction - customer_vector.direction)
+                # this means that the car is moving
+
+                angle_difference = math.fabs(vector.Vector(v.coordinates[0], v.destinations[0]).direction - customer_vector.direction)
                 if angle_difference < ARBITRARY_ANGLE:
                     potential_vehicles.append(v)
 
         if len(potential_vehicles) > 0:
-            # All vehicles travelling in the wrong direction have been filtered.
+            # All cars travelling in the wrong direction have been filtered.
             # Now we look for the vehicle that will have the shortest path.
-            # Currently no distance restrictions are implemented for moving vehicles, only stationary.
+            # Currently no distance restrictions are implemented for moving cars, only stationary.
             # This means that no matter how much distance it adds it's still acceptable.
-            # This part only uses vector magnitudes as path checking, in reality these distances could be longer.
-            # Maybe we should use the a-star method instead at a higher cost.
+
             distance_added = math.inf
             selected_array = None
             selected_vehicle = None
+            selected_destinations = None
 
             for v in potential_vehicles:
                 new_distance = 0
-                if len(v.vectors) > 0:
-
-                    vector_array = self.path_picker(v.vectors[0], customer_vector)
-
-                    for i in vector_array:
-                        new_distance += i.magnitude
+                if len(v.destinations) != 0:
+                    # this means that the car has a customer
+                    paths, distance, destinations = self.path_picker(v.coordinates[0], v.destinations[0],
+                                                                     start, destination)
+                    new_distance += distance
 
                     if new_distance < distance_added:
                         selected_vehicle = v
-                        selected_array = vector_array
+                        selected_array = paths
+                        selected_destinations = destinations
                         distance_added = new_distance
 
                 else:
-                    vector_array = [vector.Vector(v.position, start), customer_vector]
-                    for i in vector_array:
-                        new_distance += i.magnitude
+                    # this is if the car has no customer
+                    paths, distance, destinations = self.path_picker(v.coordinates[0], v.coordinates[0],
+                                                                     start, destination)
+                    new_distance = distance
 
                     if new_distance < distance_added/ARBITRARY_STATIONARY_VEHICLE_CONSTRAINT:
                         selected_vehicle = v
-                        selected_array = vector_array
+                        selected_array = paths
+                        selected_destinations = destinations
                         distance_added = new_distance
 
-            if len(selected_vehicle.vectors) > 1:
+            if len(selected_vehicle.destinations) > 1:
                 # this is if the vehicle has more than 1 customer
-                connection_vector = vector.Vector(selected_array[2].end_coordinate,
-                                                  selected_vehicle.vectors[1].endCoordinate)
-                selected_vehicle.vectors.pop(1)
-                selected_vehicle.vectors.pop(0)
-                selected_vehicle.vectors.insert(0, connection_vector)
-                selected_vehicle.vectors = selected_array + selected_vehicle.vectors
+                # then we generate a connection path between the new path and already existing path
+
+                connection_path, cost = self.generate_path(selected_array[-1], selected_vehicle.destinations[1])
+                d = selected_vehicle.destinations
+                selected_vehicle.destinations = selected_destinations + d[d.index(connection_path[-1])+1:]
+                c = selected_vehicle.coordinates
+                selected_vehicle.coordinates = selected_array + connection_path + c[c.index()+1:]
+
             else:
-                selected_vehicle.vectors = selected_array
+
+                selected_vehicle.coordinates = selected_array
+                selected_vehicle.destinations = selected_destinations
 
         else:
             # this should probably be sent to the app
             print("Sorry no vehicles found.")
 
-    def path_picker(self, vehicle_vector, customer_vector):
-        # This creates all possible paths and determines which of the 3 valid paths is the shortest
-        ab = vehicle_vector
-        cd = customer_vector
-        ac = vector.Vector(ab.start_coordinate, cd.start_coordinate)
-        bc = vector.Vector(cd.start_coordinate, ab.end_coordinate)
-        bd = vector.Vector(ab.end_coordinate, cd.end_coordinate)
-        cb = vector.Vector(cd.start_coordinate, ab.end_coordinate)
-        db = vector.Vector(cd.end_coordinate, ab.end_coordinate)
-
-        option1 = ab.magnitude + bc.magnitude + cd.magnitude
-        option2 = ac.magnitude + cb.magnitude + bd.magnitude
-        option3 = ac.magnitude + cd.magnitude + db.magnitude
-
-        if option1 < option2 and option1 < option3:
-            return [ab, bc, cd]
-        elif option2 < option1 and option2 < option3:
-            return [ac, cb, bd]
-        else:
-            return [ac, cd, db]
-
     def generate_path(self, start, destination):
         path, cost = astar.run(self.graph, start, destination)
+        return path, cost
+
+    def path_picker(self, car_location, car_destination, customer_location, customer_destination):
+        # This creates all possible paths and determines which of the 3 valid paths is the shortest
+        ab = self.generate_path(car_location, car_destination)
+        cd = self.generate_path(customer_location, customer_destination)
+        ac = self.generate_path(car_location, customer_location)
+        bc = self.generate_path(car_destination, customer_location)
+        bd = self.generate_path(car_destination, customer_destination)
+        cb = self.generate_path(customer_location, car_destination)
+        db = self.generate_path(customer_destination, car_destination)
+
+        option1 = ab[1] + bc[1] + cd[1]
+        option2 = ac[1] + cb[1] + bd[1]
+        option3 = ac[1] + cd[1] + db[1]
+        destinations1 = ab[0][-1] + bc[0][-1] + cd[0][-1]
+        destinations2 = ac[0][-1] + cb[0][-1] + bd[0][-1]
+        destinations3 = ac[0][-1] + cd[0][-1] + db[0][-1]
+
+        if option1 < option2 and option1 < option3:
+            return ab[0] + bc[0] + cd[0], option1, destinations1
+        elif option2 < option1 and option2 < option3:
+            return ac[0] + cb[0] + bd[0], option2, destinations2
+        else:
+            return ac[0] + cd[0] + db[0], option3, destinations3
+
+
 
