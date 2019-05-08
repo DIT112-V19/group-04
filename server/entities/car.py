@@ -16,6 +16,7 @@ class Car:
         self.vectors = []
         self.inner_angle = 0
         self.coordinates = []
+        self.coordinates.append(location)
 
     def __repr__(self):
         return "Id: " + self.id + ", Location: " + self.location.to_string()
