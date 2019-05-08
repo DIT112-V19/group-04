@@ -12,3 +12,9 @@ class Coordinate:
 
     def __repr__(self):
         return str((self.x, self.y))
+
+    def json(self):
+        return [self.x, self.y]
+
+    def to_string(self):
+        return str(self.x) + ", " + str(self.y)
