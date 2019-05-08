@@ -1,4 +1,4 @@
-import vector
+from utils import vector
 
 
 class Map:
@@ -7,7 +7,7 @@ class Map:
         self.nodes = {}
 
     def add_node(self, node, node2):
-        edge = vector.Vector(node.position, node2.position).magnitude
+        edge = vector.Vector(node, node2).magnitude
         try:
             self.nodes[node][node2] = edge
         except KeyError:

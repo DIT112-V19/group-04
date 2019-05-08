@@ -1,5 +1,5 @@
 import heapq
-import vector
+from utils import vector
 
 
 class PriorityQueue:

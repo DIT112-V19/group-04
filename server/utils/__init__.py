@@ -1,1 +1,1 @@
-from utils.coordinate import Coordinate
+from server.utils.coordinate import Coordinate

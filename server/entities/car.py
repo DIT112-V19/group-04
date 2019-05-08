@@ -1,5 +1,5 @@
 import math
-import numpy as np
+from utils import vector
 # START_HEADING is north
 
 START_HEADING = 0.0
@@ -8,14 +8,14 @@ TURN_RADIUS = 0.5
 
 
 class Car:
-    heading = START_HEADING
-    vectors = []
-    inner_angle = 0
-    coordinates = []
 
     def __init__(self, id, location):
         self.id = id
         self.location = location
+        self.heading = START_HEADING
+        self.vectors = []
+        self.inner_angle = 0
+        self.coordinates = []
 
     def __repr__(self):
         return "Id: " + self.id + ", Location: " + self.location.to_string()
@@ -59,7 +59,7 @@ class Car:
         while i < len(self.coordinates):
             c1 = self.coordinates[i-1]
             c2 = self.coordinates[i]
-            v1 = np.array(c1, c2)
+            v1 = vector.Vector(c1, c2)
             self.vectors.append(v1)
             i += 1
 

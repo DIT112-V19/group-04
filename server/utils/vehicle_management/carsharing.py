@@ -1,4 +1,4 @@
-import vector
+from utils import vector
 import math
 
 ARBITRARY_ANGLE = 45
