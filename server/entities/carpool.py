@@ -19,21 +19,6 @@ class Carpool:
         self.cars = []
         self.graph = {}
 
-        car_loc = Coordinate(500, 500)
-        car = Car('real', car_loc)
-        self.cars.append(car)
-
-        car_loc = Coordinate(1800, 1800)
-        car = Car('fake', car_loc)
-        self.cars.append(car)
-
-        car_loc = Coordinate(300, 1500)
-        car = Car('fake', car_loc)
-        self.cars.append(car)
-
-        car_loc = Coordinate(100, 800)
-        car = Car('fake', car_loc)
-        self.cars.append(car)
 
     def find_car(self, id):
         for car in self.cars:
@@ -110,7 +95,8 @@ class Carpool:
             else:
                 # this means that the car is moving
 
-                angle_difference = math.fabs(vector.Vector(v.coordinates[0], v.destinations[0]).direction - customer_vector.direction)
+                angle_difference = math.fabs(vector.Vector(v.coordinates[0],
+                                                           v.destinations[0]).direction - customer_vector.direction)
                 if angle_difference < ARBITRARY_ANGLE:
                     potential_vehicles.append(v)
 
@@ -141,8 +127,8 @@ class Carpool:
 
                 else:
                     # this is if the car has no customer
-                    paths, distance, destinations = self.path_picker(v.coordinates[0], v.coordinates[0],
-                                                                     start, destination)
+                    paths, distance, destinations = self.stationary_car_path(v.coordinates[0], start, destination)
+
                     new_distance = distance
 
                     if new_distance < distance_added/ARBITRARY_STATIONARY_VEHICLE_CONSTRAINT:
@@ -172,6 +158,8 @@ class Carpool:
 
     def generate_path(self, start, destination):
         path, cost = astar.run(self.graph, start, destination)
+        print(path)
+        print(cost)
         return path, cost
 
     def path_picker(self, car_location, car_destination, customer_location, customer_destination):
@@ -198,5 +186,12 @@ class Carpool:
         else:
             return ac[0] + cd[0] + db[0], option3, destinations3
 
+    def stationary_car_path(self, car_location, start, destination):
+        ab = self.generate_path(car_location, start)
+        bc = self.generate_path(start, destination)
+        path = ab[0]+bc[0]
+        cost = ab[1]+bc[1]
+        destinations = [start, destination]
+        return path, cost, destinations
 
 
