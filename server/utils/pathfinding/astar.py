@@ -1,5 +1,5 @@
 import heapq
-import vector
+from utils import vector
 
 
 class PriorityQueue:
@@ -18,7 +18,7 @@ class PriorityQueue:
 
 def heuristic(node, goal):
     # Other types of heuristics can be possibly be used
-    value = vector.Vector(node.position, goal.position).magnitude
+    value = vector.Vector(node, goal).magnitude
     return value
 
 
