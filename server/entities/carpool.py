@@ -149,8 +149,10 @@ class Carpool:
 
             else:
 
-                selected_vehicle.coordinates = selected_array
+                selected_vehicle.coordinates = [selected_vehicle.coordinates[0]]+selected_array
                 selected_vehicle.destinations = selected_destinations
+                print(selected_vehicle)
+                print(selected_vehicle.coordinates)
 
         else:
             # this should probably be sent to the app
@@ -158,8 +160,7 @@ class Carpool:
 
     def generate_path(self, start, destination):
         path, cost = astar.run(self.graph, start, destination)
-        print(path)
-        print(cost)
+
         return path, cost
 
     def path_picker(self, car_location, car_destination, customer_location, customer_destination):

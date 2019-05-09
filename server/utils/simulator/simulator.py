@@ -57,9 +57,9 @@ class Simulator:
                     j = 1
                     route = routes[i]
                     colours = ["red", "black", "green", "blue", "yellow"]
-                    while j <= len(route):
-                        start = route[j-1].start_coordinate
-                        destination = route[j-1].end_coordinate
+                    while j < len(route):
+                        start = route[j-1]
+                        destination = route[j]
                         start_x = half_size+converter(start.x)
                         start_y = half_size-converter(start.y)
                         end_x = half_size+converter(destination.x)
