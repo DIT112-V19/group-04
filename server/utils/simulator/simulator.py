@@ -1,4 +1,5 @@
-import tkinter as tk
+from tkinter import *
+from PIL import Image, ImageTk
 
 
 class Simulator:
@@ -7,44 +8,30 @@ class Simulator:
     # routes is an array of vectors, currently limited to 5 routes
     # this is just a testing purpose software, not to be confused with something good
 
-    def __init__(self, size, number_of_steps, routes):
+    def __init__(self, routes):
 
-        step_size = int(size / number_of_steps)
-        half_size = size/2
         self.routes = routes
-
         self.scaleState = 0
         self.dotState = 0
         self.pathState = 0
+        scale = 0.90
 
-        root = tk.Tk()
+        root = Tk()
         root.title("Simulator")
-
-        w = tk.Canvas(root, width=size, height=size)
+        root.state("zoomed")
+        f2 = Frame(root)
+        f2.grid(column=0, sticky="n")
+        w = Canvas(f2, width=int(root.winfo_screenwidth()*scale), height=int(root.winfo_screenheight()*scale))
         w.pack()
 
-        def draw_scale(event):
-
-            if self.scaleState == 1:
-                w.delete("scale")
-                self.scaleState -= 1
-
-            else:
-                w.create_line(0, half_size, size, half_size, tags="scale")
-                w.create_line(half_size, 0, half_size, size, tags="scale")
-                self.scaleState += 1
-
-        def draw_dots(event):
-
-            if self.dotState == 1:
-                w.delete("dot")
-                self.dotState -= 1
-            else:
-                numbers = list(range(0, size, step_size))
-                for i in numbers:
-                    for j in numbers:
-                        w.create_oval(i-1, j-1, i+1, j+1, fill="black", tags="dot")
-                self.dotState += 1
+        img = Image.open("map.png")
+        print(img.size)
+        ratio = min(int(w.cget("width")) / img.size[0], int(w.cget("height")) / img.size[1])
+        size = int(img.size[0] * ratio), int(img.size[1] * ratio)
+        self.img_h = size[1]
+        img = img.resize(size, Image.ANTIALIAS)
+        img2 = ImageTk.PhotoImage(img)
+        w.create_image(img.size[0] / 2, img.size[1] / 2, image=img2)
 
         def draw_path(event):
 
@@ -59,33 +46,19 @@ class Simulator:
                     colours = ["red", "black", "green", "blue", "yellow"]
                     while j < len(route):
                         start = route[j-1]
-                        destination = route[j]
-                        start_x = half_size+converter(start.x)
-                        start_y = half_size-converter(start.y)
-                        end_x = half_size+converter(destination.x)
-                        end_y = half_size-converter(destination.y)
-                        w.create_line(start_x, start_y, end_x, end_y, tags="path", fill=colours[i])
+                        end = route[j]
+                        w.create_line(start.x * ratio, self.img_h - start.y * ratio,
+                                      end.x * ratio, self.img_h - end.y * ratio, fill=colours[i], tags="path")
                         j += 1
                     i += 1
                 self.pathState += 1
 
-        def converter(number):
-            value = number*step_size
-
-            return value
-
         def buttons():
-            f = tk.Frame(root)
-            f.pack(side="bottom")
-            b1 = tk.Button(f, text="Scale")
-            b1.bind("<Button-1>", draw_scale)
-            b1.pack(side="left")
-            b2 = tk.Button(f, text="Dots")
-            b2.bind("<Button-1>", draw_dots)
-            b2.pack(side="left")
-            b3 = tk.Button(f, text="Path")
+            f = Frame(root)
+            f.grid(column=1, sticky="n")
+            b3 = Button(f, text="Path")
             b3.bind("<Button-1>", draw_path)
-            b3.pack(side="left")
+            b3.pack()
 
         buttons()
         root.mainloop()
