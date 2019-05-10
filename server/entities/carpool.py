@@ -1,6 +1,5 @@
 from entities.car import Car
 from entities.user import User
-from utils import Coordinate
 from flask import jsonify
 from utils import vector
 from utils.pathfinding import astar
@@ -18,7 +17,6 @@ class Carpool:
         self.users = []
         self.cars = []
         self.graph = {}
-
 
     def find_car(self, id):
         for car in self.cars:
@@ -128,7 +126,6 @@ class Carpool:
                 else:
                     # this is if the car has no customer
                     paths, distance, destinations = self.stationary_car_path(v.coordinates[0], start, destination)
-
                     new_distance = distance
 
                     if new_distance < distance_added/ARBITRARY_STATIONARY_VEHICLE_CONSTRAINT:
@@ -148,11 +145,8 @@ class Carpool:
                 selected_vehicle.coordinates = selected_array + connection_path + c[c.index()+1:]
 
             else:
-
                 selected_vehicle.coordinates = [selected_vehicle.coordinates[0]]+selected_array
                 selected_vehicle.destinations = selected_destinations
-                print(selected_vehicle)
-                print(selected_vehicle.coordinates)
 
         else:
             # this should probably be sent to the app
@@ -176,9 +170,9 @@ class Carpool:
         option1 = ab[1] + bc[1] + cd[1]
         option2 = ac[1] + cb[1] + bd[1]
         option3 = ac[1] + cd[1] + db[1]
-        destinations1 = ab[0][-1] + bc[0][-1] + cd[0][-1]
-        destinations2 = ac[0][-1] + cb[0][-1] + bd[0][-1]
-        destinations3 = ac[0][-1] + cd[0][-1] + db[0][-1]
+        destinations1 = [ab[0][-1], bc[0][-1], cd[0][-1]]
+        destinations2 = [ac[0][-1], cb[0][-1], bd[0][-1]]
+        destinations3 = [ac[0][-1], cd[0][-1], db[0][-1]]
 
         if option1 < option2 and option1 < option3:
             return ab[0] + bc[0] + cd[0], option1, destinations1
