@@ -110,29 +110,27 @@ class Carpool:
             selected_destinations = None
 
             for v in potential_vehicles:
-                new_distance = 0
+
                 if len(v.destinations) != 0:
                     # this means that the car has a customer
                     paths, distance, destinations = self.path_picker(v.coordinates[0], v.destinations[0],
                                                                      start, destination)
-                    new_distance += distance
 
-                    if new_distance < distance_added:
+                    if distance < distance_added:
                         selected_vehicle = v
                         selected_array = paths
                         selected_destinations = destinations
-                        distance_added = new_distance
+                        distance_added = distance
 
                 else:
                     # this is if the car has no customer
                     paths, distance, destinations = self.stationary_car_path(v.coordinates[0], start, destination)
-                    new_distance = distance
 
-                    if new_distance < distance_added/ARBITRARY_STATIONARY_VEHICLE_CONSTRAINT:
+                    if distance < distance_added/ARBITRARY_STATIONARY_VEHICLE_CONSTRAINT:
                         selected_vehicle = v
                         selected_array = paths
                         selected_destinations = destinations
-                        distance_added = new_distance
+                        distance_added = distance
 
             if len(selected_vehicle.destinations) > 1:
                 # this is if the vehicle has more than 1 customer
