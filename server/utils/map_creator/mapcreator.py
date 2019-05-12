@@ -29,7 +29,6 @@ class MapCreator:
         w.pack()
 
         img = Image.open("map.png")
-        print(img.size)
         ratio = min(int(w.cget("width"))/img.size[0], int(w.cget("height"))/img.size[1])
         size = int(img.size[0]*ratio), int(img.size[1]*ratio)
         self.img_h = size[1]
@@ -56,6 +55,22 @@ class MapCreator:
                 node1 = coordinate.Coordinate(self.n1[0], self.n1[1])
                 node2 = coordinate.Coordinate(self.n2[0], self.n2[1])
                 self.map.add_node(node1, node2)
+                self.n1 = []
+                self.n2 = []
+                v1.set("")
+                v2.set("")
+                w.itemconfig(self.nd1, fill="black")
+                w.itemconfig(self.nd2, fill="black")
+                self.nd1 = None
+                self.nd2 = None
+
+        def one_way_nodes(event):
+            if len(self.n1) != 0 and len(self.n2) != 0:
+                w.create_line(self.n1[0]*ratio, self.img_h-self.n1[1]*ratio,
+                              self.n2[0]*ratio, self.img_h-self.n2[1]*ratio, fill="black")
+                node1 = coordinate.Coordinate(self.n1[0], self.n1[1])
+                node2 = coordinate.Coordinate(self.n2[0], self.n2[1])
+                self.map.add_one_way_node(node1, node2)
                 self.n1 = []
                 self.n2 = []
                 v1.set("")
@@ -112,8 +127,11 @@ class MapCreator:
             b3 = Button(f, text="save and quit")
             b3.bind("<Button-1>", exit_program)
             b3.grid(row=3, sticky="w")
-            w.tag_bind('node', '<Button-3>', on_object_click)
-            w.bind('<Button-1>', add_node)
+            b4 = Button(f, text="one way nodes")
+            b4.bind("<Button-1>", one_way_nodes)
+            b4.grid(row=4, sticky="w")
+            w.tag_bind('node', '<Button-1>', on_object_click)
+            w.bind('<Button-3>', add_node)
 
         def on_object_click(event):
             item = w.find_closest(event.x, event.y)

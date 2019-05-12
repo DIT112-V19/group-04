@@ -186,5 +186,3 @@ class Carpool:
         cost = ab[1]+bc[1]
         destinations = [start, destination]
         return path, cost, destinations
-
-
