@@ -17,3 +17,10 @@ class Map:
             self.nodes[node2][node] = edge
         except KeyError:
             self.nodes[node2] = {node: edge}
+
+    def add_one_way_node(self, node, node2):
+        edge = vector.Vector(node, node2).magnitude
+        try:
+            self.nodes[node][node2] = edge
+        except KeyError:
+            self.nodes[node] = {node2: edge}
