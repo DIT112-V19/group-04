@@ -12,6 +12,8 @@
 		985EA2592253564F00D0C12F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 985EA2572253564F00D0C12F /* Main.storyboard */; };
 		985EA25B2253565200D0C12F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 985EA25A2253565200D0C12F /* Assets.xcassets */; };
 		985EA25E2253565200D0C12F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 985EA25C2253565200D0C12F /* LaunchScreen.storyboard */; };
+		CAE2E907228744F300425AA1 /* map (1).png in Resources */ = {isa = PBXBuildFile; fileRef = CAE2E906228744F300425AA1 /* map (1).png */; };
+		CAE2E9092287588300425AA1 /* mainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAE2E9082287588300425AA1 /* mainViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +24,8 @@
 		985EA25A2253565200D0C12F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		985EA25D2253565200D0C12F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		985EA25F2253565200D0C12F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CAE2E906228744F300425AA1 /* map (1).png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "map (1).png"; sourceTree = "<group>"; };
+		CAE2E9082287588300425AA1 /* mainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mainViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,12 +58,14 @@
 		985EA2522253564F00D0C12F /* CarInterface */ = {
 			isa = PBXGroup;
 			children = (
+				CAE2E906228744F300425AA1 /* map (1).png */,
 				985EA2532253564F00D0C12F /* AppDelegate.swift */,
 				985EA2552253564F00D0C12F /* ViewController.swift */,
 				985EA2572253564F00D0C12F /* Main.storyboard */,
 				985EA25A2253565200D0C12F /* Assets.xcassets */,
 				985EA25C2253565200D0C12F /* LaunchScreen.storyboard */,
 				985EA25F2253565200D0C12F /* Info.plist */,
+				CAE2E9082287588300425AA1 /* mainViewController.swift */,
 			);
 			path = CarInterface;
 			sourceTree = "<group>";
@@ -124,6 +130,7 @@
 			files = (
 				985EA25E2253565200D0C12F /* LaunchScreen.storyboard in Resources */,
 				985EA25B2253565200D0C12F /* Assets.xcassets in Resources */,
+				CAE2E907228744F300425AA1 /* map (1).png in Resources */,
 				985EA2592253564F00D0C12F /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -137,6 +144,7 @@
 			files = (
 				985EA2562253564F00D0C12F /* ViewController.swift in Sources */,
 				985EA2542253564F00D0C12F /* AppDelegate.swift in Sources */,
+				CAE2E9092287588300425AA1 /* mainViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
