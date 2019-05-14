@@ -14,9 +14,7 @@ class mainViewController: UIViewController {
     
     @IBOutlet weak var setButton: UIButton!
     
-    
-    
-    
+    var cgpoint:CGPoint?
     
     
     override func viewDidLoad() {
@@ -35,19 +33,44 @@ class mainViewController: UIViewController {
     
     
     @objc func imageTapped(tapGestureRecognizer: UITapGestureRecognizer){
-        let cgpoint = tapGestureRecognizer.location(in: imageView)
-        
-        //        cgpoint.x = cgpoint.x / imageView.bounds.width
-        //        cgpoint.y = cgpoint.y / imageView.bounds.height
+        cgpoint = tapGestureRecognizer.location(in: imageView)
+        if let bottomImage:UIImage = imageView.image {
+            let topImage = locationIcon()
+            imageView.image = bottomImage.imageByMergingImages(topImage: topImage, bottomImage: bottomImage)
+        }
         debugPrint(cgpoint)
     }
     
+    func locationIcon() -> UIImage{
+        var im:UIImage?
+        if let image = UIImage(named: "address.png"){
+            im = resizeImage(image: image)
+        }
+        return im!
+    }
+
+    func resizeImage(image: UIImage) -> UIImage? {
+
+        //let scale = newWidth / image.size.width
+        //let newHeight = image.size.height * scale
+        print("image size ", image.size)
+        UIGraphicsBeginImageContext(CGSize(width: image.size.width, height: image.size.height))
+        image.draw(in: CGRect(x: cgpoint!.x/1.1, y: cgpoint!.y/2, width: 12, height: 12))
+
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+
+        return newImage
+    }
+    
+    
     func loadImage(){
         
-        let size = imageView.bounds.size
+       let size = UIScreen.main.bounds.size
         if let image = UIImage(named:"map (1).png") {
             let finalImage = image.scaleTo(with: size)
-            self.imageView.image = image
+            self.imageView.image = finalImage
+            
         }
     }
     
@@ -55,6 +78,7 @@ class mainViewController: UIViewController {
 }
 
 extension UIImage {
+    
     func scaleTo(with size: CGSize) -> UIImage? {
         var scaledImageRect = CGRect.zero
         
@@ -76,4 +100,39 @@ extension UIImage {
         
         return scaledImage
     }
+    
+//    func resizeImage(targetSize: CGSize) -> UIImage {
+//        let size = self.size
+//        let widthRatio  = targetSize.width  / size.width
+//        let heightRatio = targetSize.height / size.height
+//        let newSize = widthRatio > heightRatio ?  CGSize(width: size.width * heightRatio, height: size.height * heightRatio) : CGSize(width: size.width / widthRatio,  height: size.height / widthRatio)
+//        let rect = CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height)
+//
+//        UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
+//        self.draw(in: rect)
+//        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+//        UIGraphicsEndImageContext()
+//
+//        return newImage!
+//    }
+//
+     func imageByMergingImages(topImage: UIImage, bottomImage: UIImage, scaleForTop: CGFloat = 1.0) -> UIImage {
+        let size = bottomImage.size
+        let container = CGRect(x: 0, y: 0, width: size.width, height: size.height)
+        UIGraphicsBeginImageContextWithOptions(size, false, 1.0)
+        UIGraphicsGetCurrentContext()!.interpolationQuality = .high
+        bottomImage.draw(in: container)
+        
+        let topWidth = size.width / scaleForTop
+        let topHeight = size.height / scaleForTop
+        let topX = (size.width / 2.0) - (topWidth / 2.0)
+        let topY = (size.height / 2.0) - (topHeight / 2.0)
+        
+        topImage.draw(in: CGRect(x: topX, y: topY, width: topWidth, height: topHeight), blendMode: .normal, alpha: 1.0)
+        
+        return UIGraphicsGetImageFromCurrentImageContext()!
+    }
+    
 }
+
+
