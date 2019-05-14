@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -59,7 +61,9 @@ Map<String, double> locationToJson(double x, double y) => {
             'y' : y,
     };
 
+  Icon pin = new Icon(Icons.pin_drop);
 
+  MarkerLayoutDelegate delegate = MarkerLayoutDelegate(relayout: CallableNotifier());
 
   Widget getGestureDetector() {
     return new Container(
@@ -67,6 +71,9 @@ Map<String, double> locationToJson(double x, double y) => {
       width: 400,
       color: Colors.white,
       child: GestureDetector(
+        // onPanUpdate: (p) {
+        //   delegate.position += p.delta;
+        // },
       onTapDown: (TapDownDetails details) => onTapDown(context, details),
       child: new Stack(fit: StackFit.expand, children: <Widget>[
         // Hack to expand stack to fill all the space. There must be a better
@@ -79,7 +86,7 @@ Map<String, double> locationToJson(double x, double y) => {
           ),
         ),
         new Positioned(
-          child: new Text(''),
+          child: pin,           
           left: posx,
           top: posy,
         )
@@ -113,5 +120,32 @@ Map<String, double> locationToJson(double x, double y) => {
         child: Icon(Icons.drive_eta),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+}
+class CallableNotifier extends ChangeNotifier {
+  void notify() {
+    this.notifyListeners();
+  }
+}
+class MarkerLayoutDelegate extends SingleChildLayoutDelegate with ChangeNotifier {
+  Offset position;
+
+  CallableNotifier _notifier;
+
+  MarkerLayoutDelegate({CallableNotifier relayout});
+
+  @override
+  BoxConstraints getConstraintsForChild(BoxConstraints constraints) {
+    return constraints.loosen();
+  }
+
+  @override
+  Offset getPositionForChild(Size size, Size childSize) {
+    return Offset(min(position.dx, size.width - childSize.width), min(position.dy, size.height - childSize.height));
+  }
+
+  @override
+  bool shouldRelayout(MarkerLayoutDelegate oldDelegate) {
+    return position != oldDelegate.position;
   }
 }
