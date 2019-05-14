@@ -14,7 +14,6 @@ ARBITRARY_STATIONARY_VEHICLE_CONSTRAINT = 1.2
 class Carpool:
 
     def __init__(self):
-        # Creating 4 cars, one is real and that's the one that will represent the physical car
         self.users = []
         self.cars = []
         self.graph = {}
@@ -28,7 +27,7 @@ class Carpool:
     def add_car(self, car):
         if isinstance(car, Car):
             print("adding car")
-            self.users.append(car)
+            self.cars.append(car)
         else:
             print('not adding')
 
@@ -133,10 +132,10 @@ class Carpool:
 
             selected_vehicle.destinations = selected_destinations
             selected_vehicle.coordinates = selected_array
+            return selected_vehicle
 
         else:
-            # this should probably be sent to the app
-            print("Sorry no vehicles found.")
+            return None
 
     def generate_customer_path(self, car_position, car_destinations, customer_start, customer_goal):
         points = [car_position, customer_start, customer_goal]+car_destinations

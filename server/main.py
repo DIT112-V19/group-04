@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify
-from utils.coordinate import Coordinate
+from utils.nodefinder import node_finder
 from entities.carpool import Carpool
 from entities.user import User
+from entities.car import Car
+import pickle
 
 app = Flask(__name__)
 carpool = Carpool()
@@ -17,24 +19,42 @@ def get_all_data():
 def pickup():
 
     # Retrieves the cookie header and splits the string so only the value remains
-    user_id = request.headers['Cookie'][3::]
+    user_id = request.headers['Cookie'][3:]
 
     # Parses the JSON payload
-    location = Coordinate(request.json["location"][0], request.json["location"][1])
-    destination = Coordinate(request.json["destination"][0], request.json["destination"][1])
+    location = node_finder(carpool.graph, request.json["location"][0], request.json["location"][1])
+    destination = node_finder(carpool.graph, request.json["destination"][0], request.json["destination"][1])
 
     # Finds or creates a user
     user = carpool.find_user(user_id)
     if user is None:
         user = User(user_id, location, destination)
         carpool.add_user(user)
-
     # Updates the users location with the ones send in the JSON payload
     user.update_location(location)
 
-    return jsonify({"carLocation": carpool.find_car('real').location.json()}), 200
+    car = carpool.logic(location, destination)
+    if car:
+        return jsonify({"carLocation": car.location.json()}), 200
+    return "no car"
 
+
+def load_map():
+    try:
+        with open('utils/map-creator/map.txt', 'rb') as infile:
+            data = pickle.load(infile)
+            infile.close()
+            return data
+    except EOFError:
+        print("No map loaded")
+
+
+carpool.graph = load_map()
+a = Car("Car 1", node_finder(carpool.graph, 0, 0))
+b = Car("Car 2", node_finder(carpool.graph, 1500, 200))
+c = Car("Car 3", node_finder(carpool.graph, 2000, 1000))
+carpool.cars.extend([a, b, c])
 
 # Makes sure the following only gets executed once
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='127.0.0.1', port=5000, debug=True)
