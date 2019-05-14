@@ -1,0 +1,5 @@
+Flask==1.0.2
+pyserial==3.4
+PyYAML==5.1
+numpy==1.16.3
+Pillow==6.0.0

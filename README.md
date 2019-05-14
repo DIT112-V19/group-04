@@ -12,6 +12,20 @@ This could potentially reduce the number of vehicles needed as people could in p
 The vehicle will be based on the Smartcar shield platform which can be viewed here.
 * [The Smartcar platform](http://plat.is/smartcar)
 
+## Requirements
+To be able to run the server you need the following:
+
+* Python 3 or newer
+* Virtualenv
+
+`virtualenv venv`
+`source venv/bin/activate`
+`pip install -r requirements.txt`
+
+In order to temporarily forward your port and make it accessible for other devices, we can use <a href="https://serveo.net/"> this service </a>:
+
+`ssh -R carpool:80:localhost:5000 serveo.net`
+
 ## Software:
 * Android Studio
 * Arduino IDE 
