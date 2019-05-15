@@ -3,6 +3,7 @@ from entities.user import User
 from flask import jsonify
 from utils import vector
 from utils.pathfinding import astar
+import itertools
 import math
 
 
@@ -13,7 +14,6 @@ ARBITRARY_STATIONARY_VEHICLE_CONSTRAINT = 1.2
 class Carpool:
 
     def __init__(self):
-        # Creating 4 cars, one is real and that's the one that will represent the physical car
         self.users = []
         self.cars = []
         self.graph = {}
@@ -27,7 +27,7 @@ class Carpool:
     def add_car(self, car):
         if isinstance(car, Car):
             print("adding car")
-            self.users.append(car)
+            self.cars.append(car)
         else:
             print('not adding')
 
@@ -92,7 +92,7 @@ class Carpool:
 
             else:
                 # this means that the car is moving
-
+                # perhaps add some maximum concurrent customer constraint
                 angle_difference = math.fabs(vector.Vector(v.coordinates[0],
                                                            v.destinations[0]).direction - customer_vector.direction)
                 if angle_difference < ARBITRARY_ANGLE:
@@ -110,11 +110,9 @@ class Carpool:
             selected_destinations = None
 
             for v in potential_vehicles:
-
                 if len(v.destinations) != 0:
-                    # this means that the car has a customer
-                    paths, distance, destinations = self.path_picker(v.coordinates[0], v.destinations[0],
-                                                                     start, destination)
+                    # this means that the car has at least one customer
+                    paths, distance, destinations = self.generate_customer_path(v.coordinates[0], v.destinations, start, destination)
 
                     if distance < distance_added:
                         selected_vehicle = v
@@ -124,7 +122,7 @@ class Carpool:
 
                 else:
                     # this is if the car has no customer
-                    paths, distance, destinations = self.stationary_car_path(v.coordinates[0], start, destination)
+                    paths, distance, destinations = self.generate_customer_path(v.coordinates[0], v.destinations, start, destination)
 
                     if distance < distance_added/ARBITRARY_STATIONARY_VEHICLE_CONSTRAINT:
                         selected_vehicle = v
@@ -132,57 +130,39 @@ class Carpool:
                         selected_destinations = destinations
                         distance_added = distance
 
-            if len(selected_vehicle.destinations) > 1:
-                # this is if the vehicle has more than 1 customer
-                # then we generate a connection path between the new path and already existing path
-
-                connection_path, cost = self.generate_path(selected_array[-1], selected_vehicle.destinations[1])
-                d = selected_vehicle.destinations
-                selected_vehicle.destinations = selected_destinations + d[d.index(connection_path[-1])+1:]
-                c = selected_vehicle.coordinates
-                selected_vehicle.coordinates = selected_array + connection_path + c[c.index()+1:]
-
-            else:
-                selected_vehicle.coordinates = [selected_vehicle.coordinates[0]]+selected_array
-                selected_vehicle.destinations = selected_destinations
+            selected_vehicle.destinations = selected_destinations
+            selected_vehicle.coordinates = selected_array
+            return selected_vehicle
 
         else:
-            # this should probably be sent to the app
-            print("Sorry no vehicles found.")
+            return None
 
-    def generate_path(self, start, destination):
-        path, cost = astar.run(self.graph, start, destination)
+    def generate_customer_path(self, car_position, car_destinations, customer_start, customer_goal):
+        points = [car_position, customer_start, customer_goal]+car_destinations
+        permutations = itertools.permutations(points)
+        valid_permutations = []
 
-        return path, cost
+        for i in permutations:
+            if i.index(customer_start) < i.index(customer_goal) and i.index(car_position) == 0:
+                valid_permutations.append(i)
 
-    def path_picker(self, car_location, car_destination, customer_location, customer_destination):
-        # This creates all possible paths and determines which of the 3 valid paths is the shortest
-        ab = self.generate_path(car_location, car_destination)
-        cd = self.generate_path(customer_location, customer_destination)
-        ac = self.generate_path(car_location, customer_location)
-        bc = self.generate_path(car_destination, customer_location)
-        bd = self.generate_path(car_destination, customer_destination)
-        cb = self.generate_path(customer_location, car_destination)
-        db = self.generate_path(customer_destination, car_destination)
+        path = []
+        cost = math.inf
+        destinations = []
 
-        option1 = ab[1] + bc[1] + cd[1]
-        option2 = ac[1] + cb[1] + bd[1]
-        option3 = ac[1] + cd[1] + db[1]
-        destinations1 = [ab[0][-1], bc[0][-1], cd[0][-1]]
-        destinations2 = [ac[0][-1], cb[0][-1], bd[0][-1]]
-        destinations3 = [ac[0][-1], cd[0][-1], db[0][-1]]
+        for i in valid_permutations:
+            new_path = []
+            new_destinations = []
+            new_cost = 0
+            for j in i:
+                if i.index(j) < len(i) - 1:
+                    partial_path, partial_cost = astar.run(self.graph, i[i.index(j)], i[i.index(j) + 1])
+                    new_path += partial_path
+                    new_cost += partial_cost
+                new_destinations.append(j)
+            if new_cost < cost:
+                path = new_path
+                cost = new_cost
+                destinations = new_destinations
 
-        if option1 < option2 and option1 < option3:
-            return ab[0] + bc[0] + cd[0], option1, destinations1
-        elif option2 < option1 and option2 < option3:
-            return ac[0] + cb[0] + bd[0], option2, destinations2
-        else:
-            return ac[0] + cd[0] + db[0], option3, destinations3
-
-    def stationary_car_path(self, car_location, start, destination):
-        ab = self.generate_path(car_location, start)
-        bc = self.generate_path(start, destination)
-        path = ab[0]+bc[0]
-        cost = ab[1]+bc[1]
-        destinations = [start, destination]
         return path, cost, destinations
