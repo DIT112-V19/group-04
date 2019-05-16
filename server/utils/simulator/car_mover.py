@@ -24,6 +24,7 @@ def move_car(car):
 
 def move_all_cars(carpool):
     lst = carpool.cars
+    global RUNNING_STATE
     RUNNING_STATE = True
 
     for car in lst:
