@@ -163,6 +163,6 @@ class Carpool:
             if new_cost < cost:
                 path = new_path
                 cost = new_cost
-                destinations = new_destinations
+                destinations = new_destinations[1:]
 
         return path, cost, destinations

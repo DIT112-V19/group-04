@@ -1,9 +1,12 @@
 from flask import Flask, request, jsonify
 from utils.nodefinder import node_finder
+from utils.simulator import car_mover
 from entities.carpool import Carpool
 from entities.user import User
 from entities.car import Car
+from threading import Thread
 import pickle
+
 
 app = Flask(__name__)
 carpool = Carpool()
@@ -30,13 +33,31 @@ def pickup():
     if user is None:
         user = User(user_id, location, destination)
         carpool.add_user(user)
+
     # Updates the users location with the ones send in the JSON payload
     user.update_location(location)
 
     car = carpool.logic(location, destination)
     if car:
+        car.add_passenger(user)
         return jsonify({"carLocation": car.location.json()}), 200
     return "no car"
+
+
+@app.route('/api/getlocation', methods=['GET'])
+def get_location():
+
+    user_id = request.headers['Cookie'][3:]
+
+    # Finds or creates a user
+    user = carpool.find_user(user_id)
+    if user:
+        for car in carpool.cars:
+            for passenger in car.passengers:
+                if passenger == user:
+                    return jsonify({"carLocation": car.location.json()}), 200
+
+    return "Not a user"
 
 
 def load_map():
@@ -49,12 +70,26 @@ def load_map():
         print("No map loaded")
 
 
+def start_flask():
+    app.run(host='127.0.0.1', port=5000)
+
+
+def run_simulation():
+    car_mover.run(carpool)
+
+
 carpool.graph = load_map()
 a = Car("Car 1", node_finder(carpool.graph, 0, 0))
 b = Car("Car 2", node_finder(carpool.graph, 1500, 200))
 c = Car("Car 3", node_finder(carpool.graph, 2000, 1000))
 carpool.cars.extend([a, b, c])
+carpool.logic(node_finder(carpool.graph, 730, 1200), node_finder(carpool.graph,2730,100))
 
 # Makes sure the following only gets executed once
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5000, debug=True)
+    t1 = Thread(target=start_flask)
+    t2 = Thread(target=run_simulation)
+
+    t1.start()
+    t2.start()
+
