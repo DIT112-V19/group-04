@@ -14,10 +14,15 @@ def move_car(car):
     distance = 0
     while distance < DISTANCE_PER_TICK:
         if len(car.coordinates) < 2:
+            if len(car.passengers) > 0:
+                car.passengers = []
             break
         point = car.coordinates.pop(0)
         if point == car.destinations[0] or car.coordinates[0] == car.destinations[0]:
             car.destinations.pop(0)
+            for p in car.passengers:
+                if p.destination == point:
+                    car.passengers.pop(car.passengers.index(p))
         distance += sqrt(pow(car.coordinates[0].x - point.x, 2)+pow(car.coordinates[0].y - point.y, 2))
         car.location = car.coordinates[0]
 

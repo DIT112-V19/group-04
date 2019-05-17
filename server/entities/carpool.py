@@ -9,6 +9,7 @@ import math
 
 ARBITRARY_ANGLE = 45
 ARBITRARY_STATIONARY_VEHICLE_CONSTRAINT = 1.2
+MAXIMUM_ALLOWED_PASSENGERS = 4
 
 
 class Carpool:
@@ -92,11 +93,12 @@ class Carpool:
 
             else:
                 # this means that the car is moving
-                # perhaps add some maximum concurrent customer constraint
+
                 angle_difference = math.fabs(vector.Vector(v.coordinates[0],
                                                            v.destinations[0]).direction - customer_vector.direction)
                 if angle_difference < ARBITRARY_ANGLE:
-                    potential_vehicles.append(v)
+                    if v.passengers < MAXIMUM_ALLOWED_PASSENGERS:
+                        potential_vehicles.append(v)
 
         if len(potential_vehicles) > 0:
             # All cars travelling in the wrong direction have been filtered.
