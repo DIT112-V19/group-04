@@ -30,7 +30,6 @@ def move_all_cars(carpool):
     for car in lst:
         if len(car.destinations) > 0:
             move_car(car)
-            print(car)
     RUNNING_STATE = False
 
 

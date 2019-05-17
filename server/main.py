@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from utils.nodefinder import node_finder
-from utils.simulator import car_mover
+from utils.simulator import car_mover, simulator
 from entities.carpool import Carpool
 from entities.user import User
 from entities.car import Car
@@ -74,8 +74,12 @@ def start_flask():
     app.run(host='127.0.0.1', port=5000)
 
 
-def run_simulation():
+def run_car_mover():
     car_mover.run(carpool)
+
+
+def run_simulator():
+    sim = simulator.Simulator(carpool)
 
 
 carpool.graph = load_map()
@@ -83,13 +87,15 @@ a = Car("Car 1", node_finder(carpool.graph, 0, 0))
 b = Car("Car 2", node_finder(carpool.graph, 1500, 200))
 c = Car("Car 3", node_finder(carpool.graph, 2000, 1000))
 carpool.cars.extend([a, b, c])
-carpool.logic(node_finder(carpool.graph, 730, 1200), node_finder(carpool.graph,2730,100))
+carpool.logic(node_finder(carpool.graph, 730, 1200), node_finder(carpool.graph, 2730, 100))
 
 # Makes sure the following only gets executed once
 if __name__ == '__main__':
     t1 = Thread(target=start_flask)
-    t2 = Thread(target=run_simulation)
+    t2 = Thread(target=run_car_mover)
+    t3 = Thread(target=run_simulator)
 
     t1.start()
     t2.start()
+    t3.start()
 
