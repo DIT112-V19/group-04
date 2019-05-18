@@ -18,6 +18,7 @@ class Car:
         self.coordinates = []
         self.destinations = []
         self.coordinates.append(location)
+        self.passengers = []
 
     def __repr__(self):
         return "Id: " + self.id + ", Location: " + self.location.to_string()
@@ -57,10 +58,10 @@ class Car:
         print("final heading:", self.heading)
 
     def calculate_vectors(self):
-        i = 1
+        i = 0
         while i < len(self.coordinates):
-            c1 = self.coordinates[i-1]
-            c2 = self.coordinates[i]
+            c1 = self.coordinates[i]
+            c2 = self.coordinates[i+1]
             v1 = vector.Vector(c1, c2)
             self.vectors.append(v1)
             i += 1
@@ -69,3 +70,7 @@ class Car:
         # probably to be scrapped
         distance = TURN_RADIUS/math.tan(math.radians(angle/2))
         return distance
+
+    def add_passenger(self, passenger):
+        self.passengers.append(passenger)
+

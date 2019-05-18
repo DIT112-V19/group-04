@@ -2,7 +2,7 @@ from tkinter import *
 import math
 import pickle
 from PIL import ImageTk, Image
-from utils.map_creator import map
+from utils.mapcreator import map
 from utils import coordinate
 
 
