@@ -97,7 +97,7 @@ class Carpool:
                 angle_difference = math.fabs(vector.Vector(v.coordinates[0],
                                                            v.destinations[0]).direction - customer_vector.direction)
                 if angle_difference < ARBITRARY_ANGLE:
-                    if v.passengers < MAXIMUM_ALLOWED_PASSENGERS:
+                    if len(v.passengers) < MAXIMUM_ALLOWED_PASSENGERS:
                         potential_vehicles.append(v)
 
         if len(potential_vehicles) > 0:
