@@ -62,7 +62,7 @@ def get_location():
 
 def load_map():
     try:
-        with open('utils/map-creator/map.txt', 'rb') as infile:
+        with open('utils/mapcreator/map.txt', 'rb') as infile:
             data = pickle.load(infile)
             infile.close()
             return data

@@ -19,7 +19,7 @@ class Simulator:
         w = Canvas(f2, width=int(root.winfo_screenwidth()*scale), height=int(root.winfo_screenheight()*scale))
         w.pack()
 
-        img = Image.open("utils/map-creator/map.png")
+        img = Image.open("utils/mapcreator/map.png")
         ratio = min(int(w.cget("width")) / img.size[0], int(w.cget("height")) / img.size[1])
         size = int(img.size[0] * ratio), int(img.size[1] * ratio)
         self.img_h = size[1]
