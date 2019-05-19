@@ -27,6 +27,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Set"/>
                                 <connections>
+                                    <action selector="setButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="NCC-Lh-Rc1"/>
                                     <segue destination="vLH-jN-qKT" kind="show" id="VTC-Yp-wkH"/>
                                 </connections>
                             </button>
@@ -36,6 +37,7 @@
                     </view>
                     <connections>
                         <outlet property="imageView" destination="uij-fM-QR1" id="PfH-32-qaf"/>
+                        <outlet property="setButton" destination="9U0-2w-4j3" id="cfm-ZM-jaG"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -85,6 +87,9 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="32"/>
                                 <state key="normal" title="Go"/>
+                                <connections>
+                                    <action selector="goButtonPressed:" destination="vLH-jN-qKT" eventType="touchUpInside" id="Um4-rW-PSf"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RWx-wv-xAF">
                                 <rect key="frame" x="148" y="301" width="79" height="44"/>
@@ -103,6 +108,9 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <viewLayoutGuide key="safeArea" id="nve-JY-ZjX"/>
                     </view>
+                    <connections>
+                        <outlet property="goButton" destination="d9H-CV-H1M" id="qaS-yB-fkL"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="hnS-3D-169" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -111,7 +119,6 @@
         <!--Login View Controller-->
         <scene sceneID="bm6-w6-xZs">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="2Gl-Uf-GVr" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <viewController id="3vY-hN-kOf" customClass="loginViewController" customModule="CarInterface" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="CVB-fT-XHs">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
@@ -142,6 +149,7 @@
                         <outlet property="textField" destination="yb9-I6-I5c" id="4xS-ZO-3fc"/>
                     </connections>
                 </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="2Gl-Uf-GVr" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1871.2" y="128.18590704647679"/>
         </scene>

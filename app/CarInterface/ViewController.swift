@@ -16,30 +16,54 @@ import CoreLocation
 class ViewController: UIViewController {
 
 
-    private final let SERVER_URL = "https://carpool.serveo.net/"
-    private final let MOVE_ENDPOINT = "move"
-    
-    
+    @IBOutlet weak var goButton: UIButton!
     override func viewDidLoad() {
-        
         super.viewDidLoad()
-        
-        sendRequest(method: "GET", endPoint: "")
     }
 
-    
-    @IBAction func forward(_ sender: Any) {
-        sendRequest(method: "GET", endPoint: MOVE_ENDPOINT)
-    }
-    
-    private func sendRequest(method: String, endPoint: String) {
-        let url = URL(string: SERVER_URL + endPoint)
+    @IBAction func goButtonPressed(_ sender: Any) {
         
-        let task = URLSession.shared.dataTask(with: url!) { (data, res, er) in
-            if let data = data {
-                print(data.description)
-            }
+        let sourceX = Int(UserManager.shared.theUser.source.x)
+        let sourceY = Int(UserManager.shared.theUser.source.y)
+        let destinationX = Int(UserManager.shared.theUser.destination.x)
+        let destinationY = Int(UserManager.shared.theUser.destination.y)
+        
+        let source = [sourceX, sourceY]
+        let destination = [destinationX, destinationY]
+        
+        let parameters = ["location": source, "destination": destination]
+        
+        let url = URL(string: "https://carpool.serveo.net/")!
+        let session = URLSession.shared
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST" //set http method as POST
+        
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: .prettyPrinted)
+        } catch let error {
+            print(error.localizedDescription)
         }
+        
+        //request.addValue("multipart/form-data boundary=(boundaryConstant)", forHTTPHeaderField: "Content-Type")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue("application/json", forHTTPHeaderField: "Accept")
+        
+        let task = session.dataTask(with: request as URLRequest, completionHandler: { data, response, error in
+            
+            guard error == nil else {
+                return
+            }
+            guard let data = data else {
+                return
+            }
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String: Any] {
+                    print(json)
+                }
+            } catch let error {
+                print(error.localizedDescription)
+            }
+        })
         task.resume()
     }
 }

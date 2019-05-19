@@ -24,7 +24,12 @@ import UIKit
         self.id = id
         self.source = source
         self.destination = destination
-        
     }
+    
+//    init(json: JSON){
+//        self.longitude = json["longitude"].double
+//        self.latitude  = json["latitude" ].double
+//        self.height    = json["height"   ].double
+//    }
     
 }

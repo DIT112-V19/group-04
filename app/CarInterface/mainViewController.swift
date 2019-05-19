@@ -17,6 +17,8 @@ class mainViewController: UIViewController {
     var cgpoint:CGPoint?
     
     
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -24,11 +26,16 @@ class mainViewController: UIViewController {
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(imageTapped(tapGestureRecognizer:)))
         imageView.isUserInteractionEnabled = true
         imageView.addGestureRecognizer(tapGestureRecognizer)
-
+        
        
     }
     
     @IBAction func setButtonTapped(_ sender: Any) {
+        if UserManager.shared.theUser.source != nil {
+            UserManager.shared.theUser.destination = cgpoint
+        }else{
+           UserManager.shared.theUser.source = cgpoint
+        }
     }
     
     
@@ -38,7 +45,6 @@ class mainViewController: UIViewController {
             let topImage = locationIcon()
             imageView.image = bottomImage.imageByMergingImages(topImage: topImage, bottomImage: bottomImage)
         }
-        debugPrint(cgpoint)
     }
     
     func locationIcon() -> UIImage{
