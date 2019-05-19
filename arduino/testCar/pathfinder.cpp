@@ -10,16 +10,19 @@ PathFinder::PathFinder(const HeadingCar& car, const Bluetooth& blue, double x, d
     m_connection(blue),
     m_x(x),
     m_y(y) {
+      // 
       m_heading = 0;
       m_turn = false;
       m_target_heading = 0;
+
+      
       m_drive = false;
       m_target_distance = 0.0;
     }
 
 
 void PathFinder::init() {
-  m_connection.getConnection().begin(9600);
+  m_connection.getConnection().begin(BAUD_RATE);
   m_connection.getConnection().println(m_heading, DEC);
   rotateToHeading(176, 30);
 }
