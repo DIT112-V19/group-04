@@ -3,6 +3,7 @@
 
 #include <Smartcar.h>
 #include "bluetooth.h"
+#include "constants.h"
 #include <stdlib.h>
 
 static const int DEG_IN_CIRCLE = 360;

@@ -1,19 +1,19 @@
 #include <Smartcar.h>
 #include "pathfinder.h"
+#include "constants.h"
+#include "usedpins.h"
 
-const int carSpeed = 50; //80% of the max speed
-const int GYROSCOPE_OFFSET = 37;
+const int carSpeed = 50; // 50% of the max speed
 
-BrushedMotor leftMotor(8, 10, 9);
-BrushedMotor rightMotor(12, 13, 11);
+BrushedMotor leftMotor(BRUSHED_LEFT_FORWARD_PIN, BRUSHED_LEFT_BACKWARD_PIN, BRUSHED_LEFT_ENABLE_PIN);
+BrushedMotor rightMotor(BRUSHED_RIGHT_FORWARD_PIN, BRUSHED_RIGHT_BACKWARD_PIN, BRUSHED_RIGHT_ENABLE_PIN);
 DifferentialControl control(leftMotor, rightMotor);
 
 GY50 gyroscope(GYROSCOPE_OFFSET);
 
 HeadingCar car(control, gyroscope);
 Bluetooth blue(Serial3);
-PathFinder pathy(car, blue, 0.0, 0.0);
-HardwareSerial ser = Serial3;
+PathFinder pathy(car, blue, DEFAULT_X, DEFAULT_Y);
 
 unsigned long start_time;
 
@@ -21,21 +21,21 @@ void setup() {
   // put your setup code here, to run once:
   //Serial.begin(9600);
   //Serial.println(pathy.getHeading(), DEC);
+  start_time = millis();  // variable holding the time program start in ms
   pathy.init();
-  start_time = millis();
-  ser.begin(9600);
+  Serial3.begin(BAUD_RATE);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   
   unsigned long now = millis();   // get the current time in ms
-  pathy.update();   // update everything on the pathfinder
+  pathy.update();   // update everything on the pathfinder -- this controls what the car does
 
-  // print only every 1000 milli seconds
-  if (now - start_time > 1000) {
+  // print only every PRINT_PERIOD
+  if (now - start_time > PRINT_PERIOD) {
     int heading = pathy.getHeading();
     Serial3.println(heading, DEC);
-    start_time = now;  
+    start_time = start_time + PRINT_PERIOD;     // prevent the printing time from drifting (would happen if it was set to now instead)
   }
 }
