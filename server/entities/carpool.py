@@ -103,7 +103,8 @@ class Carpool:
         if len(potential_vehicles) > 0:
             # All cars travelling in the wrong direction have been filtered.
             # Now we look for the vehicle that will have the shortest path.
-            # Currently no distance restrictions are implemented for moving cars, only stationary.
+            # Currently no distance restrictions are implemented.
+            # Just an arbitrary weight to reduce likelihood of picking a stationary vehicle over a moving one.
             # This means that no matter how much distance it adds it's still acceptable.
 
             distance_added = math.inf
@@ -112,25 +113,14 @@ class Carpool:
             selected_destinations = None
 
             for v in potential_vehicles:
-                if len(v.destinations) != 0:
-                    # this means that the car has at least one customer
-                    paths, distance, destinations = self.generate_customer_path(v.coordinates[0], v.destinations, start, destination)
 
-                    if distance < distance_added:
-                        selected_vehicle = v
-                        selected_array = paths
-                        selected_destinations = destinations
-                        distance_added = distance
+                paths, distance, destinations = self.generate_customer_path(v.coordinates[0], v.destinations, start, destination)
 
-                else:
-                    # this is if the car has no customer
-                    paths, distance, destinations = self.generate_customer_path(v.coordinates[0], v.destinations, start, destination)
-
-                    if distance < distance_added/ARBITRARY_STATIONARY_VEHICLE_CONSTRAINT:
-                        selected_vehicle = v
-                        selected_array = paths
-                        selected_destinations = destinations
-                        distance_added = distance
+                if distance < distance_added:
+                    selected_vehicle = v
+                    selected_array = paths
+                    selected_destinations = destinations
+                    distance_added = distance
 
             selected_vehicle.destinations = selected_destinations
             selected_vehicle.coordinates = selected_array

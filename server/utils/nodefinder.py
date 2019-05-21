@@ -1,7 +1,7 @@
 import math
 
 
-def node_finder(graph,x, y):
+def node_finder(graph, x, y):
     distance = math.inf
     found_node = None
     for node in graph:
@@ -10,3 +10,5 @@ def node_finder(graph,x, y):
             distance = new_distance
             found_node = node
     return found_node
+
+# The purpose of this is to find the closest node in the graph when receiving a requested location from the app.
