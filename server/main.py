@@ -3,7 +3,6 @@ from utils.nodefinder import node_finder
 from entities.carpool import Carpool
 from entities.user import User
 from entities.car import Car
-import json
 import pickle
 
 app = Flask(__name__)
