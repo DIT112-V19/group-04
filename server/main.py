@@ -3,6 +3,7 @@ from utils.nodefinder import node_finder
 from entities.carpool import Carpool
 from entities.user import User
 from entities.car import Car
+import json
 import pickle
 
 app = Flask(__name__)
@@ -22,8 +23,9 @@ def pickup():
     user_id = request.headers['Cookie'][3:]
 
     # Parses the JSON payload
-    location = node_finder(carpool.graph, request.json["location"][0], request.json["location"][1])
-    destination = node_finder(carpool.graph, request.json["destination"][0], request.json["destination"][1])
+    json_data = json.loads(request.data)
+    location = node_finder(carpool.graph, json_data["location"][0], json_data["location"][1])
+    destination = node_finder(carpool.graph, json_data["destination"][0], json_data["destination"][1])
 
     # Finds or creates a user
     user = carpool.find_user(user_id)
