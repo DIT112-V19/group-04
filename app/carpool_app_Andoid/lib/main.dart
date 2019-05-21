@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -33,38 +34,58 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  String url = "https://carpool.serveo.net";
+  String url = "http://127.0.0.1:5000/api/";  //"http://carpool.serveo.net/api";
 
-  double posx = 100.0;
-  double posy = 100.0;
+  double posxDestination = 100.0;
+  double posyDestination = 100.0;
+  double posxCurrent = 100.0;
+  double posyCurrent = 100.0;
 
-  void onTapDown(BuildContext context, TapDownDetails details) {
+  Map locOrDest = new Map();
+
+  void onTapDown(BuildContext context, TapDownDetails details, int locationOrDestination) {
     print('${details.globalPosition}');
     final RenderBox box = context.findRenderObject();
     final Offset localOffset = box.globalToLocal(details.globalPosition);
     setState(() {
-      posx = localOffset.dx;
-      posy = localOffset.dy;
+      if (locationOrDestination == 1) {
+        posxCurrent = localOffset.dx;
+        posyCurrent = localOffset.dy;
+      } else {
+        posxDestination = localOffset.dx;
+        posyDestination = localOffset.dy;
+      }
+      locOrDest = ({
+        1: [posxCurrent, posyCurrent],
+        2: [posxDestination, posyDestination],
+      });
     });
   }
 
-  void sendInfo(double x, double y) async {
-    final response = await http.post('$url/',
-      body: locationToJson(x, y).toString()
+  Map<String, String> headers = {
+    "Cookie": "id=kalle",
+    "Content-type" : "application/json"
+  };
+
+  void sendInfo(List<double> current, List<double> destination) async {
+    final response = await http.post('$url' + 'pickup',
+      body: json.encode(locationToJson(current, destination)),
+      headers: headers,
     );
+  
     print(response.body);
   }
 
 
-Map<String, double> locationToJson(double x, double y) => {
-            'x' : x,
-            'y' : y,
+Map<String, dynamic> locationToJson(List<double> x, List<double> y) => {
+            "location" : x,
+            "destination" : y,
     };
 
   Icon pin = new Icon(Icons.pin_drop);
 
   MarkerLayoutDelegate delegate = MarkerLayoutDelegate(relayout: CallableNotifier());
-
+  bool isLocation = true;
   Widget getGestureDetector() {
     return new Container(
       height: 300,
@@ -74,7 +95,17 @@ Map<String, double> locationToJson(double x, double y) => {
         // onPanUpdate: (p) {
         //   delegate.position += p.delta;
         // },
-      onTapDown: (TapDownDetails details) => onTapDown(context, details),
+      onTapDown: (TapDownDetails details) {
+        int destOrLoc = 1;
+        if (isLocation) {
+          destOrLoc = 1;
+          isLocation = false;
+        } else {
+          isLocation = true;
+          destOrLoc = 2;
+        }
+        onTapDown(context, details, destOrLoc);
+      },
       child: new Stack(fit: StackFit.expand, children: <Widget>[
         // Hack to expand stack to fill all the space. There must be a better
         // way to do it.
@@ -87,8 +118,8 @@ Map<String, double> locationToJson(double x, double y) => {
         ),
         new Positioned(
           child: pin,           
-          left: posx,
-          top: posy,
+          left: posxCurrent,
+          top: posyCurrent,
         )
       ]),
     ),
@@ -112,9 +143,9 @@ Map<String, double> locationToJson(double x, double y) => {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // send info
-          print(posx);
-          print(posy);
-          sendInfo(posx, posy);
+          print(locOrDest[1]);
+          print(locOrDest[2]);
+          sendInfo(locOrDest[1], locOrDest[2]);
         },
         tooltip: 'Increment',
         child: Icon(Icons.drive_eta),
