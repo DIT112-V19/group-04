@@ -1,7 +1,6 @@
 from entities.car import Car
 from entities.user import User
 from flask import jsonify
-from utils import vector
 from utils.pathfinding import astar
 import itertools
 import math
@@ -80,7 +79,6 @@ class Carpool:
 
     def logic(self, start, destination):
         potential_vehicles = []
-        customer_vector = vector.Vector(start, destination)
 
         for v in self.cars:
             # Rough filter to reduce the number of cars that we check
@@ -93,9 +91,8 @@ class Carpool:
 
             else:
                 # this means that the car is moving
+                angle_difference = math.fabs(calc_direction(v.coordinates[0], v.destinations[-1]) - calc_direction(start, destination))
 
-                angle_difference = math.fabs(vector.Vector(v.coordinates[0],
-                                                           v.destinations[-1]).direction - customer_vector.direction)
                 if angle_difference < ARBITRARY_ANGLE:
                     if len(v.passengers) < MAXIMUM_ALLOWED_PASSENGERS:
                         potential_vehicles.append(v)
@@ -166,3 +163,12 @@ class Carpool:
                 destinations = new_destinations[1:]
 
         return path, cost, destinations
+
+
+def calc_direction(coordinate1, coordinate2):
+    # flipped x and y instead of subtracting pi/2
+    direction = math.atan2(coordinate2.x-coordinate1.x, coordinate2.y-coordinate1.y)
+    if direction < 0:
+        direction += 2*math.pi
+
+    return math.degrees(direction)
