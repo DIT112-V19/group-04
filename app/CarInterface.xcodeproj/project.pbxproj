@@ -13,10 +13,10 @@
 		985EA25B2253565200D0C12F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 985EA25A2253565200D0C12F /* Assets.xcassets */; };
 		985EA25E2253565200D0C12F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 985EA25C2253565200D0C12F /* LaunchScreen.storyboard */; };
 		9F0D58C4228B1004000AADAF /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0D58C3228B1004000AADAF /* User.swift */; };
-		9F5E55B4228B79FE00A105BB /* loginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5E55B3228B79FE00A105BB /* loginViewController.swift */; };
 		9F6F5590229063F60047FA10 /* Car.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6F558F229063F60047FA10 /* Car.swift */; };
 		9F6F5592229072CE0047FA10 /* UserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6F5591229072CE0047FA10 /* UserManager.swift */; };
 		9FD4546B2289FBB0000CADFB /* address.png in Resources */ = {isa = PBXBuildFile; fileRef = 9FD4546A2289FBB0000CADFB /* address.png */; };
+		9FF1763F22958807005615A8 /* loginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF1763E22958807005615A8 /* loginViewController.swift */; };
 		CAE2E907228744F300425AA1 /* map (1).png in Resources */ = {isa = PBXBuildFile; fileRef = CAE2E906228744F300425AA1 /* map (1).png */; };
 		CAE2E9092287588300425AA1 /* mainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAE2E9082287588300425AA1 /* mainViewController.swift */; };
 /* End PBXBuildFile section */
@@ -30,10 +30,10 @@
 		985EA25D2253565200D0C12F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		985EA25F2253565200D0C12F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9F0D58C3228B1004000AADAF /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
-		9F5E55B3228B79FE00A105BB /* loginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = loginViewController.swift; path = ../../../../.Trash/loginViewController.swift; sourceTree = "<group>"; };
 		9F6F558F229063F60047FA10 /* Car.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Car.swift; sourceTree = "<group>"; };
 		9F6F5591229072CE0047FA10 /* UserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserManager.swift; sourceTree = "<group>"; };
 		9FD4546A2289FBB0000CADFB /* address.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = address.png; path = ../../../../Downloads/address.png; sourceTree = "<group>"; };
+		9FF1763E22958807005615A8 /* loginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = loginViewController.swift; sourceTree = "<group>"; };
 		CAE2E906228744F300425AA1 /* map (1).png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "map (1).png"; sourceTree = "<group>"; };
 		CAE2E9082287588300425AA1 /* mainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mainViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -79,7 +79,7 @@
 				CAE2E9082287588300425AA1 /* mainViewController.swift */,
 				9F0D58C3228B1004000AADAF /* User.swift */,
 				9F6F558F229063F60047FA10 /* Car.swift */,
-				9F5E55B3228B79FE00A105BB /* loginViewController.swift */,
+				9FF1763E22958807005615A8 /* loginViewController.swift */,
 				9F6F5591229072CE0047FA10 /* UserManager.swift */,
 			);
 			path = CarInterface;
@@ -162,7 +162,7 @@
 				9F0D58C4228B1004000AADAF /* User.swift in Sources */,
 				9F6F5592229072CE0047FA10 /* UserManager.swift in Sources */,
 				9F6F5590229063F60047FA10 /* Car.swift in Sources */,
-				9F5E55B4228B79FE00A105BB /* loginViewController.swift in Sources */,
+				9FF1763F22958807005615A8 /* loginViewController.swift in Sources */,
 				985EA2542253564F00D0C12F /* AppDelegate.swift in Sources */,
 				CAE2E9092287588300425AA1 /* mainViewController.swift in Sources */,
 			);
