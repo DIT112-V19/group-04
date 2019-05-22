@@ -26,6 +26,14 @@ void setup() {
   Serial3.begin(BAUD_RATE);
 }
 
+
+/**
+ * This function is continously looping the program implemented for the car.
+ * 
+ * It is important for all used functions to implement non-blocking behaviour. 
+ * This ensures that the single thread used for the application can handle all
+ * situations immediately.
+ */
 void loop() {
   // put your main code here, to run repeatedly:
   

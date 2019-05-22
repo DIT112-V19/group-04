@@ -43,6 +43,8 @@ public:
   
   void rotateOnSpot(int targetDegrees, int speed);
   void rotateToHeading(int targetHeading, int speed);
+
+  void moveForward(int distance, int speed);
 };
 
 int trimHeading(int heading);
