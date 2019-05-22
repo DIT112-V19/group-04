@@ -78,26 +78,29 @@ class Carpool:
         })
 
     def logic(self, start, destination):
-        potential_vehicles = []
+        potential_cars = []
 
-        for v in self.cars:
+        for car in self.cars:
             # Rough filter to reduce the number of cars that we check
             # Find cars that are standing still or moving in roughly the same direction as customer vector.
             # ARBITRARY_ANGLE can be tweaked for desired results.
-            if len(v.destinations) == 0:
+            if len(car.destinations) == 0:
                 # this means that the car is stationary
                 # maybe we can add some sort of distance filter
-                potential_vehicles.append(v)
+                potential_cars.append(car)
 
             else:
                 # this means that the car is moving
-                angle_difference = math.fabs(calc_direction(v.coordinates[0], v.destinations[-1]) - calc_direction(start, destination))
+                car_final_destination = car.destinations[-1]
+                car_direction = calc_direction(car.location, car_final_destination)
+                customer_direction = calc_direction(start, destination)
+                angle_difference = math.fabs(car_direction - customer_direction)
 
                 if angle_difference < ARBITRARY_ANGLE:
-                    if len(v.passengers) < MAXIMUM_ALLOWED_PASSENGERS:
-                        potential_vehicles.append(v)
+                    if len(car.passengers) < MAXIMUM_ALLOWED_PASSENGERS:
+                        potential_cars.append(car)
 
-        if len(potential_vehicles) > 0:
+        if len(potential_cars) > 0:
             # All cars travelling in the wrong direction have been filtered.
             # Now we look for the vehicle that will have the shortest path.
             # Currently no distance restrictions are implemented.
@@ -106,22 +109,22 @@ class Carpool:
 
             distance_added = math.inf
             selected_array = None
-            selected_vehicle = None
+            selected_car = None
             selected_destinations = None
 
-            for v in potential_vehicles:
+            for car in potential_cars:
 
-                paths, distance, destinations = self.generate_customer_path(v.coordinates[0], v.destinations, start, destination)
+                paths, distance, destinations = self.generate_customer_path(car.location, car.destinations, start, destination)
 
                 if distance < distance_added:
-                    selected_vehicle = v
+                    selected_car = car
                     selected_array = paths
                     selected_destinations = destinations
                     distance_added = distance
 
-            selected_vehicle.destinations = selected_destinations
-            selected_vehicle.coordinates = selected_array
-            return selected_vehicle
+            selected_car.destinations = selected_destinations
+            selected_car.coordinates = selected_array
+            return selected_car
 
         else:
             return None
@@ -134,6 +137,7 @@ class Carpool:
         # This generates all valid permutations of points to reach as not all permutations are valid
 
         for i in permutations:
+
             if i.index(customer_start) < i.index(customer_goal) and i.index(car_position) == 0:
                 valid_permutations.append(i)
 
