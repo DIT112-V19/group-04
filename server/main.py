@@ -41,6 +41,7 @@ def pickup():
     if car:
         car.add_passenger(user)
         return jsonify({"carLocation": car.location.json()}), 200
+    # This return message should be improved.
     return "no car"
 
 
@@ -56,7 +57,7 @@ def get_location():
             for passenger in car.passengers:
                 if passenger == user:
                     return jsonify({"carLocation": car.location.json()}), 200
-
+    # This return message should be improved.
     return "Not a user"
 
 
@@ -83,6 +84,7 @@ def run_simulator():
 
 
 carpool.graph = load_map()
+# Below is just placeholder content for testing purpose, this should be removed from final product.
 a = Car("Car 1", node_finder(carpool.graph, 0, 0))
 b = Car("Car 2", node_finder(carpool.graph, 1500, 200))
 c = Car("Car 3", node_finder(carpool.graph, 2000, 1000))

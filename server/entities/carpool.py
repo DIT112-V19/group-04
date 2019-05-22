@@ -134,6 +134,8 @@ class Carpool:
         permutations = itertools.permutations(points)
         valid_permutations = []
 
+        # This generates all valid permutations of points to reach as not all permutations are valid
+
         for i in permutations:
             if i.index(customer_start) < i.index(customer_goal) and i.index(car_position) == 0:
                 valid_permutations.append(i)
@@ -142,19 +144,25 @@ class Carpool:
         cost = math.inf
         destinations = []
 
+        # This generates the paths for each of the permutations and picks the permutation with the least cost.
+
         for i in valid_permutations:
             new_path = []
             new_destinations = []
             new_cost = 0
             for j in i:
+                # Generates the path and cost for every segment in the current permutation.
+                # Then concatenates the segment to the total of the permutation for a complete path.
                 if i.index(j) < len(i) - 1:
                     partial_path, partial_cost = astar.run(self.graph, i[i.index(j)], i[i.index(j) + 1])
                     new_path += partial_path
                     new_cost += partial_cost
                 new_destinations.append(j)
+            # If the new path is cheaper than the current cheapest path then this path replaces the old.
             if new_cost < cost:
                 path = new_path
                 cost = new_cost
+                # As the first point of the new_destinations list is the current location, this should not be appended.
                 destinations = new_destinations[1:]
 
         return path, cost, destinations
