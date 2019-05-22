@@ -1,7 +1,6 @@
 from entities.car import Car
 from entities.user import User
 from flask import jsonify
-from utils import vector
 from utils.pathfinding import astar
 import itertools
 import math
@@ -79,62 +78,53 @@ class Carpool:
         })
 
     def logic(self, start, destination):
-        potential_vehicles = []
-        customer_vector = vector.Vector(start, destination)
+        potential_cars = []
 
-        for v in self.cars:
+        for car in self.cars:
             # Rough filter to reduce the number of cars that we check
             # Find cars that are standing still or moving in roughly the same direction as customer vector.
             # ARBITRARY_ANGLE can be tweaked for desired results.
-            if len(v.destinations) == 0:
+            if len(car.destinations) == 0:
                 # this means that the car is stationary
                 # maybe we can add some sort of distance filter
-                potential_vehicles.append(v)
+                potential_cars.append(car)
 
             else:
                 # this means that the car is moving
+                car_final_destination = car.destinations[-1]
+                car_direction = calc_direction(car.location, car_final_destination)
+                customer_direction = calc_direction(start, destination)
+                angle_difference = math.fabs(car_direction - customer_direction)
 
-                angle_difference = math.fabs(vector.Vector(v.coordinates[0],
-                                                           v.destinations[0]).direction - customer_vector.direction)
                 if angle_difference < ARBITRARY_ANGLE:
-                    if len(v.passengers) < MAXIMUM_ALLOWED_PASSENGERS:
-                        potential_vehicles.append(v)
+                    if len(car.passengers) < MAXIMUM_ALLOWED_PASSENGERS:
+                        potential_cars.append(car)
 
-        if len(potential_vehicles) > 0:
+        if len(potential_cars) > 0:
             # All cars travelling in the wrong direction have been filtered.
             # Now we look for the vehicle that will have the shortest path.
-            # Currently no distance restrictions are implemented for moving cars, only stationary.
+            # Currently no distance restrictions are implemented.
+            # Just an arbitrary weight to reduce likelihood of picking a stationary vehicle over a moving one.
             # This means that no matter how much distance it adds it's still acceptable.
 
             distance_added = math.inf
             selected_array = None
-            selected_vehicle = None
+            selected_car = None
             selected_destinations = None
 
-            for v in potential_vehicles:
-                if len(v.destinations) != 0:
-                    # this means that the car has at least one customer
-                    paths, distance, destinations = self.generate_customer_path(v.coordinates[0], v.destinations, start, destination)
+            for car in potential_cars:
 
-                    if distance < distance_added:
-                        selected_vehicle = v
-                        selected_array = paths
-                        selected_destinations = destinations
-                        distance_added = distance
+                paths, distance, destinations = self.generate_customer_path(car.location, car.destinations, start, destination)
 
-                else:
-                    # this is if the car has no customer
-                    paths, distance, destinations = self.generate_customer_path(v.coordinates[0], v.destinations, start, destination)
+                if distance < distance_added:
+                    selected_car = car
+                    selected_array = paths
+                    selected_destinations = destinations
+                    distance_added = distance
 
-                    if distance < distance_added/ARBITRARY_STATIONARY_VEHICLE_CONSTRAINT:
-                        selected_vehicle = v
-                        selected_array = paths
-                        selected_destinations = destinations
-                        distance_added = distance
-
-            selected_vehicle.destinations = selected_destinations
-            selected_vehicle.coordinates = selected_array
-            return selected_vehicle
+            selected_car.destinations = selected_destinations
+            selected_car.coordinates = selected_array
+            return selected_car
 
         else:
             return None
@@ -144,7 +134,10 @@ class Carpool:
         permutations = itertools.permutations(points)
         valid_permutations = []
 
+        # This generates all valid permutations of points to reach as not all permutations are valid
+
         for i in permutations:
+
             if i.index(customer_start) < i.index(customer_goal) and i.index(car_position) == 0:
                 valid_permutations.append(i)
 
@@ -152,19 +145,34 @@ class Carpool:
         cost = math.inf
         destinations = []
 
+        # This generates the paths for each of the permutations and picks the permutation with the least cost.
+
         for i in valid_permutations:
             new_path = []
             new_destinations = []
             new_cost = 0
             for j in i:
+                # Generates the path and cost for every segment in the current permutation.
+                # Then concatenates the segment to the total of the permutation for a complete path.
                 if i.index(j) < len(i) - 1:
                     partial_path, partial_cost = astar.run(self.graph, i[i.index(j)], i[i.index(j) + 1])
                     new_path += partial_path
                     new_cost += partial_cost
                 new_destinations.append(j)
+            # If the new path is cheaper than the current cheapest path then this path replaces the old.
             if new_cost < cost:
                 path = new_path
                 cost = new_cost
+                # As the first point of the new_destinations list is the current location, this should not be appended.
                 destinations = new_destinations[1:]
 
         return path, cost, destinations
+
+
+def calc_direction(coordinate1, coordinate2):
+    # flipped x and y instead of subtracting pi/2
+    direction = math.atan2(coordinate2.x-coordinate1.x, coordinate2.y-coordinate1.y)
+    if direction < 0:
+        direction += 2*math.pi
+
+    return math.degrees(direction)

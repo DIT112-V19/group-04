@@ -14,7 +14,8 @@ carpool = Carpool()
 
 @app.route('/api')
 def get_all_data():
-    # This endpoints will be used to retrieve all information about all cars and users
+    # This endpoint is intended for use with the remote visualisation.
+    # This is used to retrieve all information about all cars and users waiting for pickup.
     return carpool.json(), 200
 
 
@@ -34,13 +35,18 @@ def pickup():
         user = User(user_id, location, destination)
         carpool.add_user(user)
 
-    # Updates the users location with the ones send in the JSON payload
+    # Updates the user's location with the ones send in the JSON payload
     user.update_location(location)
 
     car = carpool.logic(location, destination)
     if car:
+        # If a car was found for the customer, then this customer is added as a passenger.
         car.add_passenger(user)
+        # This returns the location of the car that was found.
         return jsonify({"carLocation": car.location.json()}), 200
+
+    # This return message should be improved.
+    # The intention is to return status that no car was found.
     return "no car"
 
 
@@ -49,14 +55,18 @@ def get_location():
 
     user_id = request.headers['Cookie'][3:]
 
-    # Finds or creates a user
+    # Find if the user_id is valid.
     user = carpool.find_user(user_id)
     if user:
+        # If the user exists then check if the user is a passenger.
         for car in carpool.cars:
             for passenger in car.passengers:
                 if passenger == user:
+                    # Only if the user is a passenger should the location of the car be provided.
+                    # This is to prevent unauthorised tracking of vehicles.
                     return jsonify({"carLocation": car.location.json()}), 200
-
+    # This return message should be improved.
+    # The intention is to signal that the user isn't a valid passenger.
     return "Not a user"
 
 
@@ -83,6 +93,7 @@ def run_simulator():
 
 
 carpool.graph = load_map()
+# Below is just placeholder content for testing purpose, this should be removed from final product.
 a = Car("Car 1", node_finder(carpool.graph, 0, 0))
 b = Car("Car 2", node_finder(carpool.graph, 1500, 200))
 c = Car("Car 3", node_finder(carpool.graph, 2000, 1000))

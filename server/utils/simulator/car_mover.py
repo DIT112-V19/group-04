@@ -1,7 +1,9 @@
 from math import sqrt, pow
 import time
 
-# velocity in m/s
+# This is for simulating vehicle movement
+
+# Velocity in m/s
 CAR_VELOCITY = 13
 # Whatever rate we choose
 TICK_RATE = 0.2
