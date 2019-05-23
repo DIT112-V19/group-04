@@ -10,10 +10,6 @@ import UIKit
 import MapKit
 import CoreLocation
 
-//
-//fileprivate let MERCATOR_OFFSET: Double = 268435456
-//fileprivate let MERCATOR_RADIUS: Double = 85445659.44705395
-
 class ViewController: UIViewController {
 
     @IBOutlet weak var goButton: UIButton!
@@ -47,99 +43,38 @@ class ViewController: UIViewController {
         self.destination = [destinationX, destinationY]
         self.userId = UserManager.shared.theUser.id
     }
-    
-    func sendRequest() {
-        
-         print("POST")
-        
-        
-        let param = ["location": source, "destination": destination]
-        
-        
-        
-        // create post request
-        let url = URL(string: "http://127.0.0.1:5000/api/pickup")!
-        
-        let parameters = ["location": source, "destination": destination]
-        let session = URLSession.shared
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        
-        
-        let jar = HTTPCookieStorage.shared
-        let cookieHeaderField = ["Cookie": userId]
-        let cookies = HTTPCookie.cookies(withResponseHeaderFields: cookieHeaderField, for: url)
-        jar.setCookies(cookies, for: url, mainDocumentURL: url)
-        
-        
-        do {
-            request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: .prettyPrinted)
-        } catch let error {
-            print(error.localizedDescription)
-        }
-        
-        debugPrint("hey")
-        
-        debugPrint(parameters)
-        debugPrint(cookieHeaderField)
-        
-        
-        
-        //request.addValue("multipart/form-data boundary=(boundaryConstant)", forHTTPHeaderField: "Content-Type")
-        request.addValue("application/json", forHTTPHeaderField: userId)
-        request.addValue("application/json", forHTTPHeaderField: "Accept")
-        
-        let task = session.dataTask(with: request as URLRequest, completionHandler: { data, response, error in
-            
-            guard error == nil else {
-                return
-            }
-            guard let data = data else {
-                return
-            }
-            do {
-                if let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String: Any] {
-                    print(json)
-                }
-            } catch let error {
-                print(error.localizedDescription)
-            }
-        })
-        task.resume()
-        self.getInfo()
-    }
-    
-    func getInfo(){
-        
-        print("GET")
-        
-        guard let url = URL(string: "https://levamen.serveo.net/api/pickup") else { return }
-        
-        let session = URLSession.shared
-        session.dataTask(with: url) { (data, response, error) in
-            if let response = response {
-                print(response)
-            }
-            
-            if let data = data {
-                print(data)
-                do {
-                    let json = try JSONSerialization.jsonObject(with: data, options: [])
-                    print(json)
-                } catch {
-                    print(error)
-                }
-                
-            }
-            }.resume()
-        print("DONE")
-    }
-    
 
     @IBAction func goButtonPressed(_ sender: Any) {
         self.convert()
-        self.sendRequest()
+        self.postReview()
     }
+    
+    
+    func postReview() {
+        
+        guard let url = URL(string: "https://loci.serveo.net/api/pickup") else { return }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("id=\(userId)", forHTTPHeaderField: "Cookie")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        let jsonEncoder = JSONEncoder()
+        let payLoad = PayLoad(location: source, destination: destination)
+        let httpBody = try? jsonEncoder.encode(payLoad)
+        print(String(decoding: httpBody!, as: UTF8.self))
+        request.httpBody = httpBody
+        URLSession.shared.dataTask(with: request) { (recData, response, error) in
+            if let data = recData {
+                do{
+                    let json = try JSONSerialization.jsonObject(with: data, options: [])
+                    print("JSON IS ",json)
+                  } catch {
+                    print("failed ",error.localizedDescription)
+                }
+            }
+            }.resume()
+    }
+    
+    
     
 }
 //extension Dictionary {
@@ -164,3 +99,35 @@ class ViewController: UIViewController {
 //    }()
 //}
 //
+struct PayLoad: Codable {
+    let location, destination: [Int]
+}
+struct response: Codable {
+    let carLocation: [Int]
+}
+
+func newJSONDecoder() -> JSONDecoder {
+    let decoder = JSONDecoder()
+    return decoder
+}
+
+func newJSONEncoder() -> JSONEncoder {
+    let encoder = JSONEncoder()
+    return encoder
+}
+
+extension URLSession {
+    fileprivate func codableTask<T: Codable>(with url: URL, completionHandler: @escaping (T?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+        return self.dataTask(with: url) { data, response, error in
+            guard let data = data, error == nil else {
+                completionHandler(nil, response, error)
+                return
+            }
+            completionHandler(try? newJSONDecoder().decode(T.self, from: data), response, nil)
+        }
+    }
+    
+    func payLoadTask(with url: URL, completionHandler: @escaping (PayLoad?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+        return self.codableTask(with: url, completionHandler: completionHandler)
+    }
+}

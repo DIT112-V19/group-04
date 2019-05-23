@@ -59,9 +59,9 @@ class mainViewController: UIViewController {
 
         //let scale = newWidth / image.size.width
         //let newHeight = image.size.height * scale
-        print("image size ", image.size)
+       // print("image size ", image.size)
         UIGraphicsBeginImageContext(CGSize(width: image.size.width, height: image.size.height))
-        image.draw(in: CGRect(x: cgpoint!.x/1.1, y: cgpoint!.y/2, width: 12, height: 12))
+        image.draw(in: CGRect(x: cgpoint!.x, y: cgpoint!.y/2, width: 12, height: 12))
 
         let newImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()

@@ -21,7 +21,7 @@ class loginViewController: UIViewController {
     }
     
     @IBAction func enterButtonPressed(_ sender: Any) {
-        UserManager.shared.theUser.id = "id=" + textField.text!
+        UserManager.shared.theUser.id = textField.text!
         print(user.id)
     }
     
