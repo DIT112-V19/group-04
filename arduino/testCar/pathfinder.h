@@ -4,6 +4,7 @@
 #include <Smartcar.h>
 #include "bluetooth.h"
 #include "constants.h"
+#include "usedpins.h"
 #include <stdlib.h>
 
 static const int DEG_IN_CIRCLE = 360;
@@ -15,31 +16,34 @@ static const double DEFAULT_THETA = 0.0;
 
 class PathFinder {
 private:
-  HeadingCar m_car;
-  Bluetooth m_connection;
-  double m_x;
-  double m_y;
-  int m_heading;
-
-  bool m_turn;
-  int m_target_heading;
+  HeadingCar mCar;
+  Bluetooth mConnection;
+  DirectionlessOdometer mLeftOdo;
+  DirectionlessOdometer mRightOdo;
   
-  bool m_drive;
-  double m_target_distance; 
+  double mX;
+  double mY;
+  int mHeading;
+
+  bool mTurn;
+  int mTargetHeading;
+  
+  bool mDrive;
+  double mTargetDistance; 
 
 
 public:
-  PathFinder(const HeadingCar& car, const Bluetooth& blue, double x, double y);
-  PathFinder(HeadingCar car, Bluetooth blue) : PathFinder(car, blue, DEFAULT_X, DEFAULT_Y){};
+  PathFinder(const HeadingCar& car, const Bluetooth& blue, const DirectionlessOdometer& leftOdo, const DirectionlessOdometer& rightOdo, double x, double y);
+  PathFinder(const HeadingCar car, const Bluetooth blue, const DirectionlessOdometer& leftOdo, const DirectionlessOdometer rightOdo) : PathFinder(car, blue, leftOdo, rightOdo, DEFAULT_X, DEFAULT_Y){};
 
 
-  double getX() {return m_x;}
-  double getY() {return m_y;}
-  int getHeading() {return m_heading;};
+  double getX() {return mX;}
+  double getY() {return mY;}
+  int getHeading() {return mHeading;};
 
   void init();
   void update();
-  HardwareSerial getConnection() {return m_connection.getConnection();}
+  HardwareSerial getConnection() {return mConnection.getConnection();}
   
   void rotateOnSpot(int targetDegrees, int speed);
   void rotateToHeading(int targetHeading, int speed);
