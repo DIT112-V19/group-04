@@ -9,32 +9,34 @@
  * @param x       initial x-coordinate of the PathFinder
  * @param y       initial y-coordinate of the PathFinder
  */
-PathFinder::PathFinder(const HeadingCar& car, const Bluetooth& blue, const DirectionlessOdometer& leftOdo, const DirectionlessOdometer& rightOdo, double x, double y) :
-    mCar(car),
-    mConnection(blue),      
-    mLeftOdo(leftOdo),
-    mRightOdo(rightOdo),
+PathFinder::PathFinder(const HeadingCar& car, const Bluetooth *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, double x, double y) :
+    mCar(car),  
     mX(x),
-    mY(y) {      
+    mY(y) {    
+      mConnection = blue;
+      mLeftOdo = leftOdo;
+      mRightOdo = rightOdo;  
       mHeading = 0;
+      mDistance = 0;
       mTurn = false;     // don't turn when freshly created
       mTargetHeading = 0;
 
       mDrive = false;    // don't drive when freshly created
-      mTargetDistance = 0.0;
+      mTargetDistance = 0;
     }
+
 
 /**
  * Initialise the car. This function is used to implement behaviour that should 
  * be executed once after creation.
  */
 void PathFinder::init() {
-  mConnection.getConnection().begin(BAUD_RATE);
+  mConnection->getConnection().begin(BAUD_RATE);
   
   // TODO: remove this
-  mConnection.getConnection().println(mHeading, DEC);   // test connection
+  mConnection->getConnection().println(mHeading, DEC);   // test connection
   //TODO: remove this
-  rotateToHeading(176, 30);   // test rotation
+  rotateToHeading(176, SPEED);   // test rotation
 }
 
 /**
@@ -53,17 +55,25 @@ void PathFinder::update() {
     if (diff < ANGLE_TOLERANCE || diff > DEG_IN_CIRCLE - ANGLE_TOLERANCE) {
       mCar.setSpeed(0);
       mTurn = false;
+
+      moveForward(100, SPEED);
     }
   }
 
-  // check whether distance has been passed
-  
+  if (mDrive) {
+    mDistance = mRightOdo->getDistance() + mLeftOdo->getDistance();
+
+    if (mDistance > mTargetDistance) {
+      mCar.setSpeed(0);
+      mDrive = false;
+    }
+  }  
 }
 
-/*
+
 void PathFinder::println(String text) {
-  m_connection.println(text);
-}*/
+  mConnection->println(text);
+}
 
 /**
    Rotate the car on spot at the specified degrees with the certain speed
@@ -140,10 +150,15 @@ void PathFinder::rotateToHeading(int targetHeading, int speed) {
  * @param speed       The speed to move forward with
  */
 void PathFinder::moveForward(int distance, int speed) {
-  int ticksRight = mRightOdo.getDistance();
-  int ticksLeft = mLeftOdo.getDistance();
-  int total = 0.5 * (ticksRight + ticksLeft);
 
+  // reset odometers
+  mRightOdo->reset();
+  mLeftOdo->reset();
+  
+  // set the car to driving
+  mDrive = true;
+  int currentDist = mRightOdo->getDistance() + mLeftOdo->getDistance();
+  mTargetDistance = currentDist + 2*distance;  // save twice the distance to check with the simple sum of the odometers later
   mCar.setSpeed(speed);
 }
 

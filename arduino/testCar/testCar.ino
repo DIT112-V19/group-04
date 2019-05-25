@@ -11,28 +11,28 @@ BrushedMotor rightMotor(BRUSHED_RIGHT_FORWARD_PIN, BRUSHED_RIGHT_BACKWARD_PIN, B
 DifferentialControl control(leftMotor, rightMotor);
 
 // sensors on the car
-DirectionlessOdometer leftOdometer(50), rightOdometer(50);
+DirectionlessOdometer leftOdometer(200), rightOdometer(200);
 GY50 gyroscope(GYROSCOPE_OFFSET);
 
 HeadingCar car(control, gyroscope);
-Bluetooth blue(Serial3);
-PathFinder pathy(car, blue, leftOdometer, rightOdometer, DEFAULT_X, DEFAULT_Y);
+Bluetooth blue(&Serial3);
+PathFinder pathy(car, &blue, &leftOdometer, &rightOdometer, DEFAULT_X, DEFAULT_Y);
 
-unsigned long start_time;
+unsigned long startTime;
 
 void setup() {
   // set up interrupts for the odometers
   leftOdometer.attach(ODOM_LEFT_PIN, []() {
     leftOdometer.update();
   });
-  leftOdometer.attach(ODOM_RIGHT_PIN, []() {
-    leftOdometer.update();
+  rightOdometer.attach(ODOM_RIGHT_PIN, []() {
+    rightOdometer.update();
   });
   
   // put your setup code here, to run once:
   //Serial.begin(9600);
   //Serial.println(pathy.getHeading(), DEC);
-  start_time = millis();  // variable holding the time program start in ms
+  startTime = millis();  // variable holding the time program start in ms
   pathy.init();
   BLUETOOTH.begin(BAUD_RATE);
 }
@@ -52,9 +52,12 @@ void loop() {
   pathy.update();   // update everything on the pathfinder -- this controls what the car does
 
   // print only every PRINT_PERIOD
-  if (now - start_time > PRINT_PERIOD) {
+  if (now - startTime > PRINT_PERIOD) {
     int heading = pathy.getHeading();
-    BLUETOOTH.println(heading, DEC);
-    start_time = start_time + PRINT_PERIOD;     // prevent the printing time from drifting (would happen if it was set to now instead)
+    pathy.println("Hallo");
+    //BLUETOOTH.println(heading, DEC);
+    //BLUETOOTH.println(pathy.getDistance());
+    //BLUETOOTH.println(leftOdometer.getDistance());
+    startTime = startTime + PRINT_PERIOD;     // prevent the printing time from drifting (would happen if it was set to now instead)
   }
 }

@@ -11,6 +11,9 @@ const int BAUD_RATE = 9600;
 // gyroscope calibration result
 const int GYROSCOPE_OFFSET = 37;
 
+// speed
+const int SPEED = 30;
+
 
 
 // printing 
