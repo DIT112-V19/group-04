@@ -9,12 +9,13 @@
  * @param x       initial x-coordinate of the PathFinder
  * @param y       initial y-coordinate of the PathFinder
  */
-PathFinder::PathFinder(const HeadingCar& car, const Bluetooth *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, Point pos) :
+PathFinder::PathFinder(const HeadingCar& car, const Bluetooth *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, Point pos, int speed=SPEED) :
     mCar(car),  
     mPos(pos.getX(), pos.getY()) {    
       mConnection = blue;
       mLeftOdo = leftOdo;
       mRightOdo = rightOdo;  
+      mSpeed = smartcarlib::utils::getAbsolute(speed);
       mHeading = 0;
       mDistance = 0;
       mTurn = false;     // don't turn when freshly created
@@ -35,7 +36,7 @@ void PathFinder::init() {
   // TODO: remove this
   mConnection->getConnection().println(mHeading, DEC);   // test connection
   //TODO: remove this
-  rotateToHeading(176, SPEED);   // test rotation
+  rotateToHeading(176);   // test rotation
 }
 
 /**
@@ -55,7 +56,7 @@ void PathFinder::update() {
       mCar.setSpeed(0);
       mTurn = false;
 
-      moveForward(100, SPEED);
+      moveForward(100);
     }
   }
 
@@ -75,20 +76,18 @@ void PathFinder::println(String text) {
 }
 
 /**
-   Rotate the car on spot at the specified degrees with the certain speed
-   @param degrees   The degrees to rotate on spot. Positive values for clockwise
-                    negative for counter-clockwise.
-   @param speed     The speed to rotate
-*/
-void PathFinder::rotateOnSpot(int targetDegrees, int speed) {
-  speed = smartcarlib::utils::getAbsolute(speed);
+ * Rotate the car on spot at the specified degrees with the certain speed
+ * @param degrees   The degrees to rotate on spot. Positive values for clockwise
+ *                  negative for counter-clockwise.
+ */
+void PathFinder::rotateOnSpot(int targetDegrees) {
   targetDegrees %= 360; //put it on a (-360,360) scale
   if (!targetDegrees) return; //if the target degrees is 0, don't bother doing anything
   /* Let's set opposite speed on each side of the car, so it rotates on spot */
   if (targetDegrees > 0) { //positive value means we should rotate clockwise
-    mCar.overrideMotorSpeed(speed, -speed); // left motors spin forward, right motors spin backward
+    mCar.overrideMotorSpeed(mSpeed, -mSpeed); // left motors spin forward, right motors spin backward
   } else { //rotate counter clockwise
-    mCar.overrideMotorSpeed(-speed, speed); // left motors spin backward, right motors spin forward
+    mCar.overrideMotorSpeed(-mSpeed, mSpeed); // left motors spin backward, right motors spin forward
   }
   unsigned int initialHeading = mCar.getHeading(); //the initial heading we'll use as offset to calculate the absolute displacement
   int degreesTurnedSoFar = 0; //this variable will hold the absolute displacement from the beginning of the rotation
@@ -109,14 +108,13 @@ void PathFinder::rotateOnSpot(int targetDegrees, int speed) {
 
 
 /**
- * Rotate the car on spot to the specified heading using the given speed.
+ * Rotate the car on spot to the specified heading using the internal speed.
  * 
  * Do this without blocking the thread (no loop)
  * @param targetHeading   The final heading to rotate to on spot. Calculate whether to rotate 
  *                        clockwise or counter-clockwise depending on the current heading.
- * @param speed     The speed to rotate with
  */
-void PathFinder::rotateToHeading(int targetHeading, int speed) {
+void PathFinder::rotateToHeading(int targetHeading) {
   mCar.setSpeed(0);    // make sure to stop the car initially
   targetHeading = trimHeading(targetHeading);   // trim the heading into the desired range
   int currentHeading = getHeading();
@@ -135,20 +133,19 @@ void PathFinder::rotateToHeading(int targetHeading, int speed) {
 
   // set the motors 
   if (diff > 0) { //positive value means we should rotate clockwise
-    mCar.overrideMotorSpeed(speed, -speed); // left motors spin forward, right motors spin backward
+    mCar.overrideMotorSpeed(mSpeed, -mSpeed); // left motors spin forward, right motors spin backward
   } else { //rotate counter clockwise
-    mCar.overrideMotorSpeed(-speed, speed); // left motors spin backward, right motors spin forward
+    mCar.overrideMotorSpeed(-mSpeed, mSpeed); // left motors spin backward, right motors spin forward
   }
 }
 
 /**
- * Make the car move forward in a straight line using the given speed.
+ * Make the car move forward in a straight line using the internal speed.
  * 
  * Do this witout blocking th thread (no loop)
  * @param distance    The distance for which the car is supposed to move forward.
- * @param speed       The speed to move forward with
  */
-void PathFinder::moveForward(int distance, int speed) {
+void PathFinder::moveForward(int distance) {
 
   // reset odometers
   mRightOdo->reset();
@@ -158,7 +155,44 @@ void PathFinder::moveForward(int distance, int speed) {
   mDrive = true;
   int currentDist = mRightOdo->getDistance() + mLeftOdo->getDistance();
   mTargetDistance = currentDist + 2*distance;  // save twice the distance to check with the simple sum of the odometers later
-  mCar.setSpeed(speed);
+  mCar.setSpeed(mSpeed);
+}
+
+/**
+ * Make the PathFinder go to the desired destination.
+ */
+void PathFinder::goTo(Point destination) {
+  // First calculate angle and turn needed for this operation
+  double dx = destination.getX() - mPos.getX();
+  double dy = destination.getY() - mPos.getY();
+
+  
+}
+
+
+/**
+ * Function to delete the current path of the path-finder.
+ */
+void PathFinder::clearPath() {
+  for (int i = 0; i < MAX_PATH_LENGTH; i++) {
+    mPath[i] = nullptr;
+  }
+  mReadPosition = 0;
+  mWritePosition = 0;  
+}
+
+/**
+ * Add a point to the end of the path.
+ * 
+ * @param *point    pointer to the Point that should be appended
+ */
+void PathFinder::addPoint(const Point *point) {
+  if (mWritePosition < MAX_PATH_LENGTH) {
+    mPath[mWritePosition] = point;
+    mWritePosition++;
+  } else {
+    mConnection->println("The path has maximum length. No more points can be added to it.");
+  }
 }
 
 

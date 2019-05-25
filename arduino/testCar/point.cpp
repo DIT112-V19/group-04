@@ -1,6 +1,6 @@
 #include "point.h"
 
-/*
+/**
  * Empty constructor for Point objects.
  * 
  * This constructor creates a new Point using the default coordinates. 
@@ -10,7 +10,7 @@ Point::Point() {
   my = DEFAULT_Y;
 }
 
-/*
+/**
  * Standard constructor for Point objects.
  * 
  * Create a point at the coordinates (x,y)
