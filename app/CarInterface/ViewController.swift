@@ -12,7 +12,9 @@ import CoreLocation
 
 class ViewController: UIViewController {
 
+    @IBOutlet weak var GetButton: UIButton!
     @IBOutlet weak var goButton: UIButton!
+    let url = "https://prebeo.serveo.net/api/getlocation"
     var source = [Int]()
     var destination = [Int]()
     var userId = ""
@@ -44,6 +46,11 @@ class ViewController: UIViewController {
         self.userId = UserManager.shared.theUser.id
     }
 
+    @IBAction func getButtonPressed(_ sender: Any) {
+        self.getCarLocation()
+    }
+    
+    
     @IBAction func goButtonPressed(_ sender: Any) {
         self.convert()
         self.postReview()
@@ -52,7 +59,7 @@ class ViewController: UIViewController {
     
     func postReview() {
         
-        guard let url = URL(string: "https://loci.serveo.net/api/pickup") else { return }
+        guard let url = URL(string: self.url) else { return }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("id=\(userId)", forHTTPHeaderField: "Cookie")
@@ -75,6 +82,31 @@ class ViewController: UIViewController {
     }
     
     
+    
+    
+    func getCarLocation(){
+        
+        let car = carManager.shared.theCar
+        guard let url = URL(string: self.url) else { return }
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("id=\(userId)", forHTTPHeaderField: "Cookie")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        URLSession.shared.dataTask(with: request) { (recData, response, error) in
+            if let data = recData {
+                do{
+                    let response = try? newJSONDecoder().decode(Response.self, from: data)
+                    var point = CGPoint()
+                    point.x = CGFloat(response!.carLocation[0])
+                    point.y = CGFloat(response!.carLocation[1])
+                    debugPrint(point)
+                    car.location = point
+                  }
+                  }
+            }.resume()
+    }
+    
+
     
 }
 //extension Dictionary {
@@ -102,7 +134,7 @@ class ViewController: UIViewController {
 struct PayLoad: Codable {
     let location, destination: [Int]
 }
-struct response: Codable {
+struct Response: Codable {
     let carLocation: [Int]
 }
 

@@ -110,11 +110,20 @@
                                 <rect key="frame" x="40" y="64" width="240" height="128"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FAP-Wu-m7T">
+                                <rect key="frame" x="53" y="457" width="30" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="GET"/>
+                                <connections>
+                                    <action selector="getButtonPressed:" destination="vLH-jN-qKT" eventType="touchUpInside" id="1JY-gy-Q15"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <viewLayoutGuide key="safeArea" id="nve-JY-ZjX"/>
                     </view>
                     <connections>
+                        <outlet property="GetButton" destination="FAP-Wu-m7T" id="HUQ-Va-EAN"/>
                         <outlet property="goButton" destination="d9H-CV-H1M" id="qaS-yB-fkL"/>
                     </connections>
                 </viewController>
