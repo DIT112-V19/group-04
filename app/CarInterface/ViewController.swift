@@ -59,7 +59,7 @@ class ViewController: UIViewController {
     
     func postReview() {
         
-        guard let url = URL(string: self.url) else { return }
+        guard let url = URL(string: "https://prepeo.serveo.net/api/pickup") else { return }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("id=\(userId)", forHTTPHeaderField: "Cookie")
