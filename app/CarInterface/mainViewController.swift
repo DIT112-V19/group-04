@@ -81,7 +81,6 @@ class mainViewController: UIViewController {
     }
     
     func displayCarLocation{
-        while 
         
     }
     
