@@ -16,7 +16,7 @@ GY50 gyroscope(GYROSCOPE_OFFSET);
 
 HeadingCar car(control, gyroscope);
 Bluetooth blue(&Serial3);
-PathFinder pathy(car, &blue, &leftOdometer, &rightOdometer, DEFAULT_X, DEFAULT_Y);
+PathFinder pathy(car, &blue, &leftOdometer, &rightOdometer, Point(DEFAULT_X, DEFAULT_Y));
 
 unsigned long startTime;
 

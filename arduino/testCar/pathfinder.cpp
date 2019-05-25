@@ -9,10 +9,9 @@
  * @param x       initial x-coordinate of the PathFinder
  * @param y       initial y-coordinate of the PathFinder
  */
-PathFinder::PathFinder(const HeadingCar& car, const Bluetooth *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, double x, double y) :
+PathFinder::PathFinder(const HeadingCar& car, const Bluetooth *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, Point pos) :
     mCar(car),  
-    mX(x),
-    mY(y) {    
+    mPos(pos.getX(), pos.getY()) {    
       mConnection = blue;
       mLeftOdo = leftOdo;
       mRightOdo = rightOdo;  

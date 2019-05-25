@@ -5,13 +5,12 @@
 #include "bluetooth.h"
 #include "constants.h"
 #include "usedpins.h"
+#include "point.h"
 #include <stdlib.h>
 
 static const int DEG_IN_CIRCLE = 360;
 static const int ANGLE_TOLERANCE = 5;
 
-static const double DEFAULT_X = 0.0;
-static const double DEFAULT_Y = 0.0;
 static const double DEFAULT_THETA = 0.0;
 
 class PathFinder {
@@ -20,7 +19,8 @@ private:
   Bluetooth *mConnection;
   DirectionlessOdometer *mLeftOdo;
   DirectionlessOdometer *mRightOdo;
-  
+
+  Point mPos;
   double mX;
   double mY;
   int mHeading;
@@ -32,14 +32,15 @@ private:
   bool mDrive;
   int mTargetDistance; 
 
+  Point path[64];
+
 
 public:
-  PathFinder(const HeadingCar& car, const Bluetooth *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, double x, double y);
-  PathFinder(const HeadingCar& car, const Bluetooth *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo) : PathFinder(car, blue, leftOdo, rightOdo, DEFAULT_X, DEFAULT_Y){};
+  PathFinder(const HeadingCar& car, const Bluetooth *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, Point pos);
+  PathFinder(const HeadingCar& car, const Bluetooth *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo) : PathFinder(car, blue, leftOdo, rightOdo, Point(DEFAULT_X, DEFAULT_Y)){};
 
 
-  double getX() {return mX;}
-  double getY() {return mY;}
+  Point getPos() {return mPos;}
   int getHeading() {return mHeading;};
   int getDistance() {return mDistance;};
 
