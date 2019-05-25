@@ -14,7 +14,8 @@ class ViewController: UIViewController {
 
     @IBOutlet weak var GetButton: UIButton!
     @IBOutlet weak var goButton: UIButton!
-    let url = "https://prebeo.serveo.net/api/getlocation"
+    let urlPost = "https://prebeo.serveo.net/api/pickup"
+    let urlGet = "https://prebeo.serveo.net/api/getlocation"
     var source = [Int]()
     var destination = [Int]()
     var userId = ""
@@ -59,7 +60,7 @@ class ViewController: UIViewController {
     
     func postReview() {
         
-        guard let url = URL(string: "https://prepeo.serveo.net/api/pickup") else { return }
+        guard let url = URL(string: urlPost) else { return }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("id=\(userId)", forHTTPHeaderField: "Cookie")
@@ -87,7 +88,7 @@ class ViewController: UIViewController {
     func getCarLocation(){
         
         let car = carManager.shared.theCar
-        guard let url = URL(string: self.url) else { return }
+        guard let url = URL(string: self.urlGet) else { return }
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("id=\(userId)", forHTTPHeaderField: "Cookie")

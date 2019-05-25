@@ -80,10 +80,7 @@ class mainViewController: UIViewController {
         }
     }
     
-    func displayCarLocation{
-        
-    }
-    
+   
 
 }
 
