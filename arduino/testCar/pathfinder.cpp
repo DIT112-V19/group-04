@@ -166,6 +166,7 @@ void PathFinder::goTo(Point destination) {
   double dx = destination.getX() - mPos.getX();
   double dy = destination.getY() - mPos.getY();
 
+  double targetHeading = atan2(dx, dy);       // switch x and y to count clockwise from North
   
 }
 

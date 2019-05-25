@@ -7,6 +7,7 @@
 #include "usedpins.h"
 #include "point.h"
 #include <stdlib.h>
+#include <math.h>
 
 static const int DEG_IN_CIRCLE = 360;
 static const int ANGLE_TOLERANCE = 5;
