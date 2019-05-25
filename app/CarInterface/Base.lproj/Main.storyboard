@@ -95,6 +95,7 @@
                                 <state key="normal" title="Go"/>
                                 <connections>
                                     <action selector="goButtonPressed:" destination="vLH-jN-qKT" eventType="touchUpInside" id="Um4-rW-PSf"/>
+                                    <segue destination="vwW-oy-N6S" kind="show" id="Fhp-Wj-oOm"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RWx-wv-xAF">
@@ -117,6 +118,9 @@
                                 <connections>
                                     <action selector="getButtonPressed:" destination="vLH-jN-qKT" eventType="touchUpInside" id="1JY-gy-Q15"/>
                                 </connections>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zNE-OI-lV2">
+                                <rect key="frame" x="145" y="516" width="30" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -130,6 +134,35 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="hnS-3D-169" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-860.625" y="129.92957746478874"/>
+        </scene>
+        <!--Main View Controller-->
+        <scene sceneID="rae-5V-9s2">
+            <objects>
+                <viewController id="vwW-oy-N6S" customClass="mainViewController" customModule="CarInterface" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="bhB-47-Uls">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="0N6-9a-KNR">
+                                <rect key="frame" x="0.0" y="20" width="320" height="548"/>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="yv5-h1-Heu" firstAttribute="trailing" secondItem="0N6-9a-KNR" secondAttribute="trailing" id="DsP-IP-Lrc"/>
+                            <constraint firstItem="0N6-9a-KNR" firstAttribute="top" secondItem="yv5-h1-Heu" secondAttribute="top" id="bmV-gf-HGc"/>
+                            <constraint firstItem="0N6-9a-KNR" firstAttribute="leading" secondItem="yv5-h1-Heu" secondAttribute="leading" id="cwf-Cj-zsV"/>
+                            <constraint firstItem="yv5-h1-Heu" firstAttribute="bottom" secondItem="0N6-9a-KNR" secondAttribute="bottom" id="qzs-jL-Asb"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="yv5-h1-Heu"/>
+                    </view>
+                    <connections>
+                        <outlet property="imageView" destination="0N6-9a-KNR" id="EnH-wZ-CPw"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="XkA-vV-AXI" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-861" y="901"/>
         </scene>
         <!--Login View Controller-->
         <scene sceneID="bm6-w6-xZs">
