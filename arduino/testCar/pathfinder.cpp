@@ -11,7 +11,8 @@
  */
 PathFinder::PathFinder(const HeadingCar& car, const Bluetooth *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, Point pos, int speed=SPEED) :
     mCar(car),  
-    mPos(pos.getX(), pos.getY()) {    
+    mPos(pos.getX(), pos.getY()),
+    mPrev(pos.getX(), pos.getY()) {    
       mConnection = blue;
       mLeftOdo = leftOdo;
       mRightOdo = rightOdo;  
@@ -48,6 +49,7 @@ void PathFinder::init() {
 void PathFinder::update() {
   mCar.update();     // update to integrate the latest heading sensor readings
   mHeading = mCar.getHeading();   // in the scale of 0 to 360
+
   
   // check whether the heading is in an acceptable range
   if (mTurn) {
@@ -61,15 +63,40 @@ void PathFinder::update() {
       }
     }
   } else if (mDrive) {
-    mDistance = mRightOdo->getDistance() + mLeftOdo->getDistance();
+    updatePosition();    
 
     if (mDistance > mTargetDistance) {
       mCar.setSpeed(0);
       mDrive = false;
     }
-  }  
+  } else {
+    setNextGoal();
+  }
 }
 
+/**
+ * Function to update the current position of the PathFinder according to its path.
+ */
+void PathFinder::updatePosition() {
+  mDistance = mRightOdo->getDistance() + mLeftOdo->getDistance();
+  double radHead = ((double) mTargetHeading) * M_PI / 180.0;
+  double dist = (double) mDistance;
+  dist *= 0.5;
+  double dx = (0.5 * ((double) mDistance)) * sin(radHead); 
+  double dy = ((double) mDistance) * cos(radHead);
+
+  double x = mPrev.getX() + dx;
+  double y = mPrev.getY() + dy;
+  
+  mPos.set(x, y);
+  char buffer[50];
+  char xstring[7];
+  char ystring[7];
+  dtostrf(x,7, 3, xstring);
+  dtostrf(y,7, 3, ystring);
+  sprintf(buffer, "heading: %d, mDist: %d \tx: %s \ty: %s\n", mTargetHeading, mDistance, xstring, ystring);
+  println(buffer); 
+}
 
 void PathFinder::println(String text) {
   mConnection->println(text);
@@ -199,6 +226,10 @@ void PathFinder::addPoint(const Point *point) {
   } else {
     mConnection->println("The path has maximum length. No more points can be added to it.");
   }
+}
+
+void PathFinder::setNextGoal() {
+  
 }
 
 

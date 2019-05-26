@@ -14,7 +14,10 @@ public:
   Point(double x, double y);
 
   double getX() {return mx;};
+  void setX(double x) {mx = x;};
   double getY() {return my;};
+  void setY(double y) {my = y;};
+  void set(double x, double y) {setX(x); setY(y);};
 };
 
 

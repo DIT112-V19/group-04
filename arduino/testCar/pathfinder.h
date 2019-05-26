@@ -24,6 +24,7 @@ private:
   DirectionlessOdometer *mRightOdo;
 
   Point mPos;
+  Point mPrev;
   int mSpeed;
   int mHeading;
   int mDistance;
@@ -55,6 +56,7 @@ public:
 
   void init();
   void update();
+  void updatePosition();
   HardwareSerial getConnection() {return mConnection->getConnection();}
 
   void println(String text);
@@ -67,6 +69,7 @@ public:
 
   void clearPath();  
   void addPoint(const Point *point);
+  void setNextGoal();
 };
 
 int trimHeading(int heading);
