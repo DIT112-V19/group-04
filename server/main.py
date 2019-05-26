@@ -5,11 +5,16 @@ from entities.carpool import Carpool
 from entities.user import User
 from entities.car import Car
 from threading import Thread
+import time as time
+from utils.bluetooth.serial_connection import SerialConnection
 import pickle
 
 
+OUR_SMART_CAR = "Car 1"
+
 app = Flask(__name__)
 carpool = Carpool()
+bluetooth = SerialConnection('bluetooth')
 
 
 @app.route('/api')
@@ -42,6 +47,11 @@ def pickup():
     if car:
         # If a car was found for the customer, then this customer is added as a passenger.
         car.add_passenger(user)
+
+        # If the car is the one represented by our SmartCar, we forward the new path
+        if car.id == OUR_SMART_CAR:
+            bluetooth.send_path(car.coordinates)
+
         # This returns the location of the car that was found.
         return jsonify({"carLocation": car.location.json()}), 200
 
@@ -89,7 +99,12 @@ def run_car_mover():
 
 
 def run_simulator():
-    sim = simulator.Simulator(carpool)
+    simulator.Simulator(carpool)
+
+
+def clear_path():
+    time.sleep(1)
+    bluetooth.clear_path()
 
 
 carpool.graph = load_map()
@@ -105,8 +120,9 @@ if __name__ == '__main__':
     t1 = Thread(target=start_flask)
     t2 = Thread(target=run_car_mover)
     t3 = Thread(target=run_simulator)
+    t4 = Thread(target=clear_path)
 
     t1.start()
     t2.start()
     t3.start()
-
+    t4.start()
