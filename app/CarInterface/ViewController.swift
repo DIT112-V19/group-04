@@ -11,166 +11,140 @@ import MapKit
 import CoreLocation
 
 class ViewController: UIViewController {
-
-    @IBOutlet weak var rButton: UIButton!
-    @IBOutlet weak var imageView: UIImageView!
-    @IBOutlet weak var mapView: MKMapView!
-    private final let SERVER_URL = "https://carpool.serveo.net/"
-    private final let MOVE_ENDPOINT = "move"
-    let locationManager = CLLocationManager()
-    let regionInMeters: Double = 1000
-    var directionsArray: [MKDirections] = []
     
+    @IBOutlet weak var GetButton: UIButton!
+    @IBOutlet weak var goButton: UIButton!
+    let urlPost = "https://prebeo.serveo.net/api/pickup"
+    let urlGet = "https://prebeo.serveo.net/api/getlocation"
+    var source = [Int]()
+    var destination = [Int]()
+    var userId = ""
     override func viewDidLoad() {
         super.viewDidLoad()
-        checkLocationServices()
-        
-        // Tests the root endpoint of server to make sure we can access it
-        sendRequest(method: "GET", endPoint: "")
-    }
-
-    @IBAction func rButtonTapped(_ sender: Any) {
-        initLindHolmenMap()
-    }
-    @IBAction func forward(_ sender: Any) {
-        sendRequest(method: "GET", endPoint: MOVE_ENDPOINT)
     }
     
-    private func sendRequest(method: String, endPoint: String) {
-        let url = URL(string: SERVER_URL + endPoint)
+    func convert() -> Void {
         
-        let task = URLSession.shared.dataTask(with: url!) { (data, res, er) in
-            if let data = data {
-                print(data.description)
+        let screenSize = UIScreen.main.bounds
+        let screenWidth = screenSize.width
+        let screenHeight = screenSize.height
+        
+        
+        let sX = (UserManager.shared.theUser.source.x/screenWidth) * 1557
+        let sY = (UserManager.shared.theUser.source.y/screenHeight) * 2768
+        let dX = (UserManager.shared.theUser.destination.x/screenWidth) * 1557
+        let dY = (UserManager.shared.theUser.destination.y/screenHeight) * 2768
+        
+        
+        let sourceX = Int(sX)
+        let sourceY = Int(sY)
+        let destinationX = Int(dX)
+        let destinationY = Int(dY)
+        
+        
+        self.source = [sourceX, sourceY]
+        self.destination = [destinationX, destinationY]
+        self.userId = UserManager.shared.theUser.id
+    }
+    
+    @IBAction func getButtonPressed(_ sender: Any) {
+        self.getCarLocation()
+    }
+    
+    
+    @IBAction func goButtonPressed(_ sender: Any) {
+        self.convert()
+        self.postReview()
+    }
+    
+    
+    func postReview() {
+        let car = carManager.shared.theCar
+        guard let url = URL(string: urlPost) else { return }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("id=\(userId)", forHTTPHeaderField: "Cookie")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        let jsonEncoder = JSONEncoder()
+        let payLoad = PayLoad(location: source, destination: destination)
+        let httpBody = try? jsonEncoder.encode(payLoad)
+        print(String(decoding: httpBody!, as: UTF8.self))
+        request.httpBody = httpBody
+        URLSession.shared.dataTask(with: request) { (recData, response, error) in
+            if let data = recData {
+                do{
+                    if let response = try? newJSONDecoder().decode(Response.self, from: data){
+                        var point = CGPoint()
+                        point.x = CGFloat(response.carLocation[0])
+                        point.y = CGFloat(response.carLocation[1])
+                    debugPrint(point)
+                        car.location = point
+                        
+                    }
+                }
             }
-        }
-        task.resume()
-    }
-    
-   
-    
-    func checkLocationServices() {
-        if CLLocationManager.locationServicesEnabled() {
-            setupLocationManager()
-            checkLocationAuthorization()
-        } else {
-            // Show alert letting the user know they have to turn this on.
-        }
-    }
-    
-    func setupLocationManager() {
-        locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
-    }
-    
-    func checkLocationAuthorization() {
-        switch CLLocationManager.authorizationStatus() {
-        case .authorizedWhenInUse:
-            locationManager.requestAlwaysAuthorization()
-            
-        case .denied:
-            locationManager.requestAlwaysAuthorization()
-            
-        case .notDetermined:
-            locationManager.requestAlwaysAuthorization()
-            
-        case .restricted:
-            locationManager.requestAlwaysAuthorization()
-            
-        case .authorizedAlways:
-            initLindHolmenMap()
-            showCompass()
-            showTrackingButton()
-            break
-        }
+            }.resume()
     }
     
     
-    func showCompass() {
-        mapView.showsCompass = false
-        let comapssButton = MKCompassButton(mapView:mapView)
-        comapssButton.compassVisibility = .visible
-        mapView.addSubview(comapssButton)
+    
+    
+    func getCarLocation(){
         
-        comapssButton.translatesAutoresizingMaskIntoConstraints = false
-        comapssButton.leftAnchor.constraint(equalTo: mapView.leftAnchor, constant: 15).isActive = true
-        comapssButton.topAnchor.constraint(equalTo: mapView.topAnchor, constant: 25).isActive = true
-        
+        let car = carManager.shared.theCar
+        guard let url = URL(string: self.urlGet) else { return }
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("id=\(userId)", forHTTPHeaderField: "Cookie")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        URLSession.shared.dataTask(with: request) { (recData, response, error) in
+            if let data = recData {
+                do{
+                    if let response = try? newJSONDecoder().decode(Response.self, from: data){
+                        var point = CGPoint()
+                        point.x = CGFloat(response.carLocation[0])
+                        point.y = CGFloat(response.carLocation[1])
+                        debugPrint(point)
+                        car.location = point
+                    }
+                }
+            }
+            }.resume()
     }
     
-    func showTrackingButton() {
-        let userTrackingButton = MKUserTrackingButton(mapView: mapView)
-        mapView.addSubview(userTrackingButton)
-        userTrackingButton.translatesAutoresizingMaskIntoConstraints = false
-        userTrackingButton.rightAnchor.constraint(equalTo: mapView.rightAnchor, constant: -5).isActive = true
-        userTrackingButton.topAnchor.constraint(equalTo: mapView.topAnchor, constant: 25).isActive = true
-        
-        
-    }
-    
-    
-    
-    func initLindHolmenMap(){
-        let lindHolmenLoc = CLLocation(latitude: 57.708604, longitude: 11.938750)
-        let regionRadius = CLLocationDistance(exactly: 1000)!
-        let linHolmenRegion = MKCoordinateRegion(center:lindHolmenLoc.coordinate, latitudinalMeters: regionRadius
-                , longitudinalMeters: regionRadius)
-        let edgeInsets = UIEdgeInsets(top: 15, left: 15, bottom: 15, right: 15);
-        mapView.setVisibleMapRect(MKMapRectForCoordinateRegion(region: linHolmenRegion), edgePadding: edgeInsets, animated: true)
-        
-        mapView.isScrollEnabled = false
-        mapView.isZoomEnabled = false
-        mapView.isRotateEnabled = false
-    }
-    
-    
-    func MKMapRectForCoordinateRegion(region:MKCoordinateRegion) -> MKMapRect {
-        let topLeft = CLLocationCoordinate2D(latitude: region.center.latitude + (region.span.latitudeDelta/2), longitude: region.center.longitude - (region.span.longitudeDelta/2))
-        let bottomRight = CLLocationCoordinate2D(latitude: region.center.latitude - (region.span.latitudeDelta/2), longitude: region.center.longitude + (region.span.longitudeDelta/2))
-        
-        let a = MKMapPoint(topLeft)
-        let b = MKMapPoint(bottomRight)
-        
-        return MKMapRect(origin: MKMapPoint(x:min(a.x,b.x), y:min(a.y,b.y)), size: MKMapSize(width: abs(a.x-b.x), height: abs(a.y-b.y)))
-    }
     
     
 }
 
-
-extension ViewController: CLLocationManagerDelegate {
-    
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.last else { return }
-        let region = MKCoordinateRegion.init(center: location.coordinate, latitudinalMeters: regionInMeters, longitudinalMeters: regionInMeters)
-        mapView.setRegion(region, animated: true)
-    }
-    
-    
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        checkLocationAuthorization()
-    }
-    
+struct PayLoad: Codable {
+    let location, destination: [Int]
+}
+struct Response: Codable {
+    let carLocation: [Int]
 }
 
-extension MKCoordinateRegion{
-    var mapRect:MKMapRect {
-        get{
-            let a = MKMapPoint(CLLocationCoordinate2DMake(
-                self.center.latitude + self.span.latitudeDelta / 2,
-                self.center.longitude - self.span.longitudeDelta / 2))
-            
-            let b = MKMapPoint(CLLocationCoordinate2DMake(
-                self.center.latitude - self.span.latitudeDelta / 2,
-                self.center.longitude + self.span.longitudeDelta / 2))
-            
-            return MKMapRect(x: min(a.x,b.x), y: min(a.y,b.y), width: abs(a.x-b.x), height: abs(a.y-b.y))
+func newJSONDecoder() -> JSONDecoder {
+    let decoder = JSONDecoder()
+    return decoder
+}
+
+func newJSONEncoder() -> JSONEncoder {
+    let encoder = JSONEncoder()
+    return encoder
+}
+
+extension URLSession {
+    fileprivate func codableTask<T: Codable>(with url: URL, completionHandler: @escaping (T?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+        return self.dataTask(with: url) { data, response, error in
+            guard let data = data, error == nil else {
+                completionHandler(nil, response, error)
+                return
+            }
+            completionHandler(try? newJSONDecoder().decode(T.self, from: data), response, nil)
         }
     }
-}
-
-extension MKMapView {
-    func setVisibleRegion(mapRegion: MKCoordinateRegion, edgePadding insets: UIEdgeInsets, animated animate: Bool) {
-        self.setVisibleMapRect(mapRegion.mapRect, edgePadding: insets , animated: animate)
+    
+    func payLoadTask(with url: URL, completionHandler: @escaping (PayLoad?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+        return self.codableTask(with: url, completionHandler: completionHandler)
     }
 }
