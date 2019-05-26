@@ -21,13 +21,16 @@ class mainViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        UIApplication.shared.isStatusBarHidden = true
         loadImage()
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(imageTapped(tapGestureRecognizer:)))
         imageView.isUserInteractionEnabled = true
         imageView.addGestureRecognizer(tapGestureRecognizer)
         
         
+    }
+    override var prefersStatusBarHidden: Bool {
+        return true
     }
     
     @IBAction func setButtonTapped(_ sender: Any) {

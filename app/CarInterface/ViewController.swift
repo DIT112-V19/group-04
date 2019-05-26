@@ -59,7 +59,7 @@ class ViewController: UIViewController {
     
     
     func postReview() {
-        
+        let car = carManager.shared.theCar
         guard let url = URL(string: urlPost) else { return }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -73,10 +73,14 @@ class ViewController: UIViewController {
         URLSession.shared.dataTask(with: request) { (recData, response, error) in
             if let data = recData {
                 do{
-                    let json = try JSONSerialization.jsonObject(with: data, options: [])
-                    print("JSON IS ",json)
-                } catch {
-                    print("failed ",error.localizedDescription)
+                    if let response = try? newJSONDecoder().decode(Response.self, from: data){
+                        var point = CGPoint()
+                        point.x = CGFloat(response.carLocation[0])
+                        point.y = CGFloat(response.carLocation[1])
+                    debugPrint(point)
+                        car.location = point
+                        
+                    }
                 }
             }
             }.resume()
@@ -96,12 +100,13 @@ class ViewController: UIViewController {
         URLSession.shared.dataTask(with: request) { (recData, response, error) in
             if let data = recData {
                 do{
-                    let response = try? newJSONDecoder().decode(Response.self, from: data)
-                    var point = CGPoint()
-                    point.x = CGFloat(response!.carLocation[0])
-                    point.y = CGFloat(response!.carLocation[1])
-                    debugPrint(point)
-                    car.location = point
+                    if let response = try? newJSONDecoder().decode(Response.self, from: data){
+                        var point = CGPoint()
+                        point.x = CGFloat(response.carLocation[0])
+                        point.y = CGFloat(response.carLocation[1])
+                        debugPrint(point)
+                        car.location = point
+                    }
                 }
             }
             }.resume()
