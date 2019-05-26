@@ -1,26 +1,31 @@
 #include "bluetooth.h"
 
 // constructor for Bluetooth module
-Bluetooth::Bluetooth(HardwareSerial& connection) : 
-  m_connection(connection),
-  m_position(0) {}
+Bluetooth::Bluetooth(const HardwareSerial *connection) : 
+  mPosition(0) {
+    mConnection = connection;
+  }
 
 void Bluetooth::init() {
-  m_connection.begin(9600);
+  mConnection->begin(BAUD_RATE);
 }
 
 
 void Bluetooth::readSerial() {
-  while (m_connection.available() > 0) {
-    char data = m_connection.read();
-    if (data == '\n' || m_position > 63) {
-      parseCommand(m_buffer, m_position);
-      memset(&m_buffer[0], 0, sizeof(m_buffer));    // erase the buffer's content
+  while (mConnection->available() > 0) {
+    char data = mConnection->read();
+    if (data == '\n' || mPosition > 63) {
+      parseCommand(mBuffer, mPosition);
+      memset(&mBuffer[0], 0, sizeof(mBuffer));    // erase the buffer's content
     } else {
-      m_buffer[m_position] = data;
-      m_position++;
+      mBuffer[mPosition] = data;
+      mPosition++;
     }
   }
+}
+
+void Bluetooth::println(String text) {
+  mConnection->println(text);
 }
 
 /** 

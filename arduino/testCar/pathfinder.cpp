@@ -1,68 +1,120 @@
 #include "pathfinder.h"
 
-
-/*PathFinder::PathFinder(HeadingCar car) {
-  PathFinder(car, DEFAULT_X, DEFAULT_Y, DEFAULT_THETA);
-}*/
-
-PathFinder::PathFinder(const HeadingCar& car, const Bluetooth& blue, double x, double y) :
-    m_car(car),
-    m_connection(blue),
-    m_x(x),
-    m_y(y) {
-      // 
-      m_heading = 0;
-      m_turn = false;
-      m_target_heading = 0;
-
-      
-      m_drive = false;
-      m_target_distance = 0.0;
+/**
+ * Constructor of a PathFinder car using a HeadingCar and a Bluetooth connection
+ * for control and communication.
+ * 
+ * @param car     HeadingCar used for steering the PathFinder
+ * @param blue    Bluetooth connection used for communication
+ * @param x       initial x-coordinate of the PathFinder
+ * @param y       initial y-coordinate of the PathFinder
+ */
+PathFinder::PathFinder(const HeadingCar& car, const Bluetooth *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, Point pos, int speed=SPEED) :
+    mCar(car),  
+    mPos(pos.getX(), pos.getY()),
+    mPrev(pos.getX(), pos.getY()) {    
+      mConnection = blue;
+      mLeftOdo = leftOdo;
+      mRightOdo = rightOdo;  
+      mSpeed = smartcarlib::utils::getAbsolute(speed);
     }
 
 
+/**
+ * Initialise the car. This function is used to implement behaviour that should 
+ * be executed once after creation.
+ */
 void PathFinder::init() {
-  m_connection.getConnection().begin(BAUD_RATE);
-  m_connection.getConnection().println(m_heading, DEC);
-  rotateToHeading(176, 30);
+  mConnection->getConnection().begin(BAUD_RATE);
+  
+  // TODO: remove this
+  mConnection->getConnection().println(mHeading, DEC);   // test connection
+
+  addPoint(Point(50, 100));
+  addPoint(Point(50, -50));
+  addPoint(Point(0, 0));
 }
 
+/**
+ * Function to update the state of the PathFinder. Should be called repeatedly.
+ * 
+ * Polling this function allows to determine whether the PathFinder has completed
+ * it's job and can be stopped until the next destination is set.
+ */
 void PathFinder::update() {
-  m_car.update();     // update to integrate the latest heading sensor readings
-  m_heading = m_car.getHeading();   // in the scale of 0 to 360
-  
-  // check whether the heading is in an acceptable range
-  if (m_turn) {
-    int diff =  abs(m_target_heading - m_heading);
+  mCar.update();     // update to integrate the latest heading sensor readings
+  mHeading = mCar.getHeading();   // in the scale of 0 to 360
+
+  if (mTurn) {
+    // stop turning if the heading is in an acceptable range
+    int diff =  abs(mTargetHeading - mHeading);
     if (diff < ANGLE_TOLERANCE || diff > DEG_IN_CIRCLE - ANGLE_TOLERANCE) {
-      m_car.setSpeed(0);
-      m_turn = false;
+      mCar.setSpeed(0);
+      mTurn = false;
+      if (mDrive) {
+        moveForward(mTargetDistance);        
+      }
     }
+    
+  } else if (mDrive) {
+    // stop heading forward if the required distance has been passed
+    updatePosition();    
+
+    if (mDistance > mTargetDistance) {
+      mCar.setSpeed(0);
+      mDrive = false;
+      mDistance = 0;
+    }
+    
+  } else {
+    // set the next goal if the current goal has been reached
+    setNextGoal();
   }
 }
 
-/*
+/**
+ * Function to update the current position of the PathFinder according to its path.
+ */
+void PathFinder::updatePosition() {
+  mDistance = mRightOdo->getDistance() + mLeftOdo->getDistance();
+  double radHead = ((double) mTargetHeading) * M_PI / 180.0;
+  double dist = (double) mDistance;
+  dist *= 0.5;
+  double dx = dist * sin(radHead); 
+  double dy = dist * cos(radHead);
+
+  double x = mPrev.getX() + dx;
+  double y = mPrev.getY() + dy;
+  
+  mPos.set(x, y);
+  char buffer[50];
+  char xstring[7];
+  char ystring[7];
+  dtostrf(x,7, 3, xstring);
+  dtostrf(y,7, 3, ystring);
+  sprintf(buffer, "heading: %d, mDist: %d \tx: %s \ty: %s\n", mTargetHeading, mDistance, xstring, ystring);
+  println(buffer); 
+}
+
 void PathFinder::println(String text) {
-  m_connection.println(text);
-}*/
+  mConnection->println(text);
+}
 
 /**
-   Rotate the car on spot at the specified degrees with the certain speed
-   @param degrees   The degrees to rotate on spot. Positive values for clockwise
-                    negative for counter-clockwise.
-   @param speed     The speed to rotate
-*/
-void PathFinder::rotateOnSpot(int targetDegrees, int speed) {
-  speed = smartcarlib::utils::getAbsolute(speed);
+ * Rotate the car on spot at the specified degrees with the certain speed
+ * @param degrees   The degrees to rotate on spot. Positive values for clockwise
+ *                  negative for counter-clockwise.
+ */
+void PathFinder::rotateOnSpot(int targetDegrees) {
   targetDegrees %= 360; //put it on a (-360,360) scale
   if (!targetDegrees) return; //if the target degrees is 0, don't bother doing anything
   /* Let's set opposite speed on each side of the car, so it rotates on spot */
   if (targetDegrees > 0) { //positive value means we should rotate clockwise
-    m_car.overrideMotorSpeed(speed, -speed); // left motors spin forward, right motors spin backward
+    mCar.overrideMotorSpeed(mSpeed, -mSpeed); // left motors spin forward, right motors spin backward
   } else { //rotate counter clockwise
-    m_car.overrideMotorSpeed(-speed, speed); // left motors spin backward, right motors spin forward
+    mCar.overrideMotorSpeed(-mSpeed, mSpeed); // left motors spin backward, right motors spin forward
   }
-  unsigned int initialHeading = m_car.getHeading(); //the initial heading we'll use as offset to calculate the absolute displacement
+  unsigned int initialHeading = mCar.getHeading(); //the initial heading we'll use as offset to calculate the absolute displacement
   int degreesTurnedSoFar = 0; //this variable will hold the absolute displacement from the beginning of the rotation
   while (abs(degreesTurnedSoFar) < abs(targetDegrees)) { //while absolute displacement hasn't reached the (absolute) target, keep turning 
     int currentHeading = getHeading(); 
@@ -76,23 +128,23 @@ void PathFinder::rotateOnSpot(int targetDegrees, int speed) {
     degreesTurnedSoFar = initialHeading - currentHeading; //degrees turned so far is initial heading minus current (initial heading
     //is at least 0 and at most 360. To handle the "edge" cases we substracted or added 360 to currentHeading)
   }
-  m_car.setSpeed(0); //we have reached the target, so stop the car
+  mCar.setSpeed(0); //we have reached the target, so stop the car
 }
 
 
 /**
-   Rotate the car on spot to the specified heading using the given speed
-   Do this without blocking the thread (no loop)
-   @param targetHeading   The final heading to rotate to on spot. Calculate whether to rotate 
-                          clockwise or counter-clockwise depending on the current heading.
-   @param speed     The speed to rotate with
-*/
-void PathFinder::rotateToHeading(int target_heading, int speed) {
-  m_car.setSpeed(0);    // make sure to stop the car initially
-  target_heading = trimHeading(target_heading);   // trim the heading into the desired range
-  int current_heading = getHeading();
+ * Rotate the car on spot to the specified heading using the internal speed.
+ * 
+ * Do this without blocking the thread (no loop)
+ * @param targetHeading   The final heading to rotate to on spot. Calculate whether to rotate 
+ *                        clockwise or counter-clockwise depending on the current heading.
+ */
+void PathFinder::rotateToHeading(int targetHeading) {
+  mCar.setSpeed(0);    // make sure to stop the car initially
+  targetHeading = trimHeading(targetHeading);   // trim the heading into the desired range
+  int currentHeading = getHeading();
 
-  int diff = target_heading - current_heading;
+  int diff = targetHeading - currentHeading;
   // always turn the shortest direction
   if (diff > 180) {   
     diff -= DEG_IN_CIRCLE;      
@@ -101,26 +153,116 @@ void PathFinder::rotateToHeading(int target_heading, int speed) {
   }
 
   // set the car to turning mode
-  m_turn = true;
-  m_target_heading = target_heading;
+  mTurn = true;
+  mTargetHeading = targetHeading;
 
   // set the motors 
   if (diff > 0) { //positive value means we should rotate clockwise
-    m_car.overrideMotorSpeed(speed, -speed); // left motors spin forward, right motors spin backward
+    mCar.overrideMotorSpeed(mSpeed, -mSpeed); // left motors spin forward, right motors spin backward
   } else { //rotate counter clockwise
-    m_car.overrideMotorSpeed(-speed, speed); // left motors spin backward, right motors spin forward
+    mCar.overrideMotorSpeed(-mSpeed, mSpeed); // left motors spin backward, right motors spin forward
+  }
+}
+
+/**
+ * Make the car move forward in a straight line using the internal speed.
+ * 
+ * Do this witout blocking th thread (no loop)
+ * @param distance    The distance for which the car is supposed to move forward.
+ */
+void PathFinder::moveForward(int distance) {
+  // reset odometers
+  mRightOdo->reset();
+  mLeftOdo->reset();
+  
+  // set the car to driving
+  mDrive = true;
+  int currentDist = mRightOdo->getDistance() + mLeftOdo->getDistance();
+  mTargetDistance = currentDist + 2*distance;  // save twice the distance to check with the simple sum of the odometers later
+  mCar.setSpeed(mSpeed);
+}
+
+/**
+ * Make the PathFinder go to the desired destination.
+ * 
+ * @param destination   The point which the PathFinder is supposed to go to
+ */
+void PathFinder::goToPoint(Point destination) {
+  // First calculate angle and turn needed for this operation
+  double dx = destination.getX() - mPos.getX();
+  double dy = destination.getY() - mPos.getY();
+  int targetHeading = (int) (atan2(dx, dy) * 180 / M_PI + 0.5);       // switch x and y to count clockwise from North
+  double targetDistance = sqrt(pow(dx,2) + pow(dy, 2));
+
+  // initiate the journey to the target
+  rotateToHeading(targetHeading);
+  mTargetDistance = (int) targetDistance;
+  mDrive = true;
+}
+
+
+/**
+ * Function to delete the current path of the path-finder.
+ */
+void PathFinder::clearPath() {
+  for (int i = 0; i < MAX_PATH_LENGTH; i++) {
+    mPath[i] = Point(0, 0);
+  }
+  mReadPosition = 0;
+  mWritePosition = 0;  
+}
+
+/**
+ * Add a point to the end of the path.
+ * 
+ * @param *point    pointer to the Point that should be appended
+ */
+void PathFinder::addPoint(const Point point) {
+  if (mWritePosition < MAX_PATH_LENGTH) {
+    mPath[mWritePosition] = point;
+    mWritePosition++;
+  } else {
+    mConnection->println("The path has maximum length. No more points can be added to it.");
+  }
+}
+
+/**
+ * Set the PathFinder to go to the next point from the list if available.
+ * 
+ * This function sets up the next turn and drive if there are still further points in the path.
+ */
+void PathFinder::setNextGoal() {
+  // check whether destinations are left unhandled and go there if so
+  if (mReadPosition < mWritePosition && !mDrive && !mTurn) {
+    println("Setting next goal!");
+    if (mReadPosition > 0) {
+      Point p = mPath[mReadPosition - 1];
+      mPos.set(p.getX(), p.getY());
+      mPrev.set(p.getX(), p.getY());
+    }
+    Point destination = mPath[mReadPosition];
+    mReadPosition++;
+    goToPoint(destination);
   }
 }
 
 
+/**
+ * Method to move any heading [deg] into the allowed range (0 -- DEG_IN_CIRCLE)
+ * 
+ * This method is not specific to the path finder but rather a mathematical 
+ * operation on our coordinate system.
+ * @param heading     Heading value in degrees before trimming
+ */ 
 int trimHeading(int heading) {
+  //TODO: migrate this function into a class defining the used coordinate system 
   // move negative heading into the range 0 -- DEG_IN_CIRCLE
   // modulo does not do this as desired
   while (heading < 0) {
     heading = heading + DEG_IN_CIRCLE;
   }
 
-  // if the heading is to big, bring it back into the desired range
+  // if the heading is too big, bring it back into the desired range
   while (heading >= DEG_IN_CIRCLE) {
     heading = heading - DEG_IN_CIRCLE;
   }

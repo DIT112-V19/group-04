@@ -4,45 +4,72 @@
 #include <Smartcar.h>
 #include "bluetooth.h"
 #include "constants.h"
+#include "usedpins.h"
+#include "point.h"
 #include <stdlib.h>
+#include <math.h>
 
 static const int DEG_IN_CIRCLE = 360;
 static const int ANGLE_TOLERANCE = 5;
 
-static const double DEFAULT_X = 0.0;
-static const double DEFAULT_Y = 0.0;
 static const double DEFAULT_THETA = 0.0;
+
+static const int MAX_PATH_LENGTH = 64;
 
 class PathFinder {
 private:
-  HeadingCar m_car;
-  Bluetooth m_connection;
-  double m_x;
-  double m_y;
-  int m_heading;
+  HeadingCar mCar;
+  Bluetooth *mConnection;
+  DirectionlessOdometer *mLeftOdo;
+  DirectionlessOdometer *mRightOdo;
 
-  bool m_turn;
-  int m_target_heading;
+  Point mPos = Point(0, 0);
+  Point mPrev = Point(0, 0);
+  int mSpeed;
+  int mHeading = 0;
+  int mDistance = 0;
+
+  bool mTurn = false;
+  int mTargetHeading = 0;
   
-  bool m_drive;
-  double m_target_distance; 
+  bool mDrive = false;
+  int mTargetDistance = 0; 
 
+  Point mPath[MAX_PATH_LENGTH];
+  int mReadPosition = 0;
+  int mWritePosition = 0;
 
 public:
-  PathFinder(const HeadingCar& car, const Bluetooth& blue, double x, double y);
-  PathFinder(HeadingCar car, Bluetooth blue) : PathFinder(car, blue, DEFAULT_X, DEFAULT_Y){};
+  PathFinder(const HeadingCar& car, const Bluetooth *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, Point pos, int speed=SPEED);
+  PathFinder(const HeadingCar& car, const Bluetooth *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, int speed=SPEED) : 
+                PathFinder(car, blue, leftOdo, rightOdo, Point(DEFAULT_X, DEFAULT_Y), speed){};
 
 
-  double getX() {return m_x;}
-  double getY() {return m_y;}
-  int getHeading() {return m_heading;};
+  Point getPos() {return mPos;}
+  int getHeading() {return mHeading;};
+  int getDistance() {return mDistance;};
+  int getTargetDistance() {return mTargetDistance;};
+  void setTargetDistance(int dist) {mTargetDistance = dist;};
+  int getSpeed() {return mSpeed;};
+  void setSpeed(int speed) {mSpeed = speed;};
+  
 
   void init();
   void update();
-  HardwareSerial getConnection() {return m_connection.getConnection();}
+  void updatePosition();
+  HardwareSerial getConnection() {return mConnection->getConnection();}
+
+  void println(String text);
   
-  void rotateOnSpot(int targetDegrees, int speed);
-  void rotateToHeading(int targetHeading, int speed);
+  void rotateOnSpot(int targetDegrees);
+  void rotateToHeading(int targetHeading);
+
+  void moveForward(int distance);
+  void goToPoint(Point destination);
+
+  void clearPath();  
+  void addPoint(const Point point);
+  void setNextGoal();
 };
 
 int trimHeading(int heading);

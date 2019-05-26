@@ -2,12 +2,13 @@
 #define BLUETOOTH_H
 #include <Smartcar.h>
 #include <HardwareSerial.h>
+#include "constants.h"
 
 class Bluetooth 
 {
 public:
   // construction and initialization
-  Bluetooth(HardwareSerial& connection);
+  Bluetooth(const HardwareSerial *connection);
   void init();
 
   
@@ -22,13 +23,14 @@ public:
   void parseCommand(char *command, int length);
 
   // getters and setters
-  HardwareSerial getConnection() {return m_connection;}
+  HardwareSerial getConnection() {return *mConnection;}
+  void println(String text);
 
 
 private:
-  HardwareSerial m_connection;
-  char m_buffer[64];
-  int m_position;
+  HardwareSerial *mConnection;
+  char mBuffer[64];
+  int mPosition;
 };
 
 #endif
