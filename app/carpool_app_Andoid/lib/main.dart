@@ -4,6 +4,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'models.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -12,9 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Carpool App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      color: blueColor,
       home: MyHomePage(title: 'Carpool App'),
     );
   }
@@ -72,7 +72,6 @@ class _MyHomePageState extends State<MyHomePage> {
       body: json.encode(locationToJson(current, destination)),
       headers: headers,
     );
-  
     print(response.body);
   }
 
@@ -83,12 +82,14 @@ Map<String, dynamic> locationToJson(List<double> x, List<double> y) => {
     };
 
   Icon pin = new Icon(Icons.pin_drop);
+  bool isLocation = true;
+  bool locationHasBeenSet = false;
+  bool destinationHasBeenSet = false;
 
   MarkerLayoutDelegate delegate = MarkerLayoutDelegate(relayout: CallableNotifier());
-  bool isLocation = true;
   Widget getGestureDetector() {
     return new Container(
-      height: 300,
+      height: 210,
       width: 400,
       color: Colors.white,
       child: GestureDetector(
@@ -99,10 +100,10 @@ Map<String, dynamic> locationToJson(List<double> x, List<double> y) => {
         int destOrLoc = 1;
         if (isLocation) {
           destOrLoc = 1;
-          isLocation = false;
+          locationHasBeenSet = true;
         } else {
-          isLocation = true;
           destOrLoc = 2;
+          destinationHasBeenSet = true;
         }
         onTapDown(context, details, destOrLoc);
       },
@@ -130,12 +131,44 @@ Map<String, dynamic> locationToJson(List<double> x, List<double> y) => {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.title, style: buttonTextStyle,),
+        backgroundColor: blueColor,
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(bottom: 20),
+              child: Column(
+                children: <Widget>[
+                              RaisedButton(
+              color: blueColor,
+              child: Container(
+                width: 140,
+                child: Center(
+                  child: Text("Set Your Location", style: buttonTextStyle,),
+                ),
+              ),
+              onPressed: () {
+                isLocation = true;
+              },
+            ),
+            RaisedButton(
+              color: blueColor,
+              child: Container(
+                width: 140,
+                child: Center(
+                  child: Text("Set Destination", style: buttonTextStyle),
+                ),
+              ),
+              onPressed: () {
+                isLocation = false;
+              },
+            ),
+                ],
+              ),
+            ),
             getGestureDetector(),
           ],
         ),
@@ -143,10 +176,11 @@ Map<String, dynamic> locationToJson(List<double> x, List<double> y) => {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // send info
-          print(locOrDest[1]);
-          print(locOrDest[2]);
-          sendInfo(locOrDest[1], locOrDest[2]);
+          if (locationHasBeenSet && destinationHasBeenSet) {
+            sendInfo(locOrDest[1], locOrDest[2]);
+          }
         },
+        backgroundColor: blueColor,
         tooltip: 'Increment',
         child: Icon(Icons.drive_eta),
       ), // This trailing comma makes auto-formatting nicer for build methods.
