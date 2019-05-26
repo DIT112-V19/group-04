@@ -35,7 +35,7 @@ private:
   bool mDrive;
   int mTargetDistance; 
 
-  Point *mPath[MAX_PATH_LENGTH];
+  Point mPath[MAX_PATH_LENGTH];
   int mReadPosition;
   int mWritePosition;
 
@@ -68,7 +68,7 @@ public:
   void goToPoint(Point destination);
 
   void clearPath();  
-  void addPoint(const Point *point);
+  void addPoint(const Point point);
   void setNextGoal();
 };
 

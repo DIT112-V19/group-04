@@ -36,8 +36,10 @@ void PathFinder::init() {
   
   // TODO: remove this
   mConnection->getConnection().println(mHeading, DEC);   // test connection
-  
-  goToPoint(Point(50, 100));
+
+  addPoint(Point(50, 100));
+  addPoint(Point(50, -50));
+  addPoint(Point(0, 0));
 }
 
 /**
@@ -50,26 +52,29 @@ void PathFinder::update() {
   mCar.update();     // update to integrate the latest heading sensor readings
   mHeading = mCar.getHeading();   // in the scale of 0 to 360
 
-  
-  // check whether the heading is in an acceptable range
   if (mTurn) {
+    // stop turning if the heading is in an acceptable range
     int diff =  abs(mTargetHeading - mHeading);
     if (diff < ANGLE_TOLERANCE || diff > DEG_IN_CIRCLE - ANGLE_TOLERANCE) {
       mCar.setSpeed(0);
       mTurn = false;
-
       if (mDrive) {
         moveForward(mTargetDistance);        
       }
     }
+    
   } else if (mDrive) {
+    // stop heading forward if the required distance has been passed
     updatePosition();    
 
     if (mDistance > mTargetDistance) {
       mCar.setSpeed(0);
       mDrive = false;
+      mDistance = 0;
     }
+    
   } else {
+    // set the next goal if the current goal has been reached
     setNextGoal();
   }
 }
@@ -82,8 +87,8 @@ void PathFinder::updatePosition() {
   double radHead = ((double) mTargetHeading) * M_PI / 180.0;
   double dist = (double) mDistance;
   dist *= 0.5;
-  double dx = (0.5 * ((double) mDistance)) * sin(radHead); 
-  double dy = ((double) mDistance) * cos(radHead);
+  double dx = dist * sin(radHead); 
+  double dy = dist * cos(radHead);
 
   double x = mPrev.getX() + dx;
   double y = mPrev.getY() + dy;
@@ -180,7 +185,7 @@ void PathFinder::moveForward(int distance) {
   // set the car to driving
   mDrive = true;
   int currentDist = mRightOdo->getDistance() + mLeftOdo->getDistance();
-  // mTargetDistance = currentDist + 2*distance;  // save twice the distance to check with the simple sum of the odometers later
+  mTargetDistance = currentDist + 2*distance;  // save twice the distance to check with the simple sum of the odometers later
   mCar.setSpeed(mSpeed);
 }
 
@@ -208,7 +213,7 @@ void PathFinder::goToPoint(Point destination) {
  */
 void PathFinder::clearPath() {
   for (int i = 0; i < MAX_PATH_LENGTH; i++) {
-    mPath[i] = nullptr;
+    mPath[i] = Point(0, 0);
   }
   mReadPosition = 0;
   mWritePosition = 0;  
@@ -219,7 +224,7 @@ void PathFinder::clearPath() {
  * 
  * @param *point    pointer to the Point that should be appended
  */
-void PathFinder::addPoint(const Point *point) {
+void PathFinder::addPoint(const Point point) {
   if (mWritePosition < MAX_PATH_LENGTH) {
     mPath[mWritePosition] = point;
     mWritePosition++;
@@ -228,8 +233,24 @@ void PathFinder::addPoint(const Point *point) {
   }
 }
 
+/**
+ * Set the PathFinder to go to the next point from the list if available.
+ * 
+ * This function sets up the next turn and drive if there are still further points in the path.
+ */
 void PathFinder::setNextGoal() {
-  
+  // check whether destinations are left unhandled and go there if so
+  if (mReadPosition < mWritePosition && !mDrive && !mTurn) {
+    println("Setting next goal!");
+    if (mReadPosition > 0) {
+      Point p = mPath[mReadPosition - 1];
+      mPos.set(p.getX(), p.getY());
+      mPrev.set(p.getX(), p.getY());
+    }
+    Point destination = mPath[mReadPosition];
+    mReadPosition++;
+    goToPoint(destination);
+  }
 }
 
 
