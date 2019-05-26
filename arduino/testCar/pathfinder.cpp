@@ -17,13 +17,6 @@ PathFinder::PathFinder(const HeadingCar& car, const Bluetooth *blue, const Direc
       mLeftOdo = leftOdo;
       mRightOdo = rightOdo;  
       mSpeed = smartcarlib::utils::getAbsolute(speed);
-      mHeading = 0;
-      mDistance = 0;
-      mTurn = false;     // don't turn when freshly created
-      mTargetHeading = 0;
-
-      mDrive = false;    // don't drive when freshly created
-      mTargetDistance = 0;
     }
 
 

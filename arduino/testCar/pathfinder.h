@@ -23,21 +23,21 @@ private:
   DirectionlessOdometer *mLeftOdo;
   DirectionlessOdometer *mRightOdo;
 
-  Point mPos;
-  Point mPrev;
+  Point mPos = Point(0, 0);
+  Point mPrev = Point(0, 0);
   int mSpeed;
-  int mHeading;
-  int mDistance;
+  int mHeading = 0;
+  int mDistance = 0;
 
-  bool mTurn;
-  int mTargetHeading;
+  bool mTurn = false;
+  int mTargetHeading = 0;
   
-  bool mDrive;
-  int mTargetDistance; 
+  bool mDrive = false;
+  int mTargetDistance = 0; 
 
   Point mPath[MAX_PATH_LENGTH];
-  int mReadPosition;
-  int mWritePosition;
+  int mReadPosition = 0;
+  int mWritePosition = 0;
 
 public:
   PathFinder(const HeadingCar& car, const Bluetooth *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, Point pos, int speed=SPEED);
