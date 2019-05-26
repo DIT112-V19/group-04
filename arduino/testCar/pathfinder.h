@@ -47,8 +47,11 @@ public:
   Point getPos() {return mPos;}
   int getHeading() {return mHeading;};
   int getDistance() {return mDistance;};
+  int getTargetDistance() {return mTargetDistance;};
+  void setTargetDistance(int dist) {mTargetDistance = dist;};
   int getSpeed() {return mSpeed;};
   void setSpeed(int speed) {mSpeed = speed;};
+  
 
   void init();
   void update();
@@ -60,7 +63,7 @@ public:
   void rotateToHeading(int targetHeading);
 
   void moveForward(int distance);
-  void goTo(Point destination);
+  void goToPoint(Point destination);
 
   void clearPath();  
   void addPoint(const Point *point);

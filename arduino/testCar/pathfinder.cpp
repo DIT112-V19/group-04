@@ -35,8 +35,8 @@ void PathFinder::init() {
   
   // TODO: remove this
   mConnection->getConnection().println(mHeading, DEC);   // test connection
-  //TODO: remove this
-  rotateToHeading(176);   // test rotation
+  
+  goToPoint(Point(50, 100));
 }
 
 /**
@@ -56,11 +56,11 @@ void PathFinder::update() {
       mCar.setSpeed(0);
       mTurn = false;
 
-      moveForward(100);
+      if (mDrive) {
+        moveForward(mTargetDistance);        
+      }
     }
-  }
-
-  if (mDrive) {
+  } else if (mDrive) {
     mDistance = mRightOdo->getDistance() + mLeftOdo->getDistance();
 
     if (mDistance > mTargetDistance) {
@@ -146,7 +146,6 @@ void PathFinder::rotateToHeading(int targetHeading) {
  * @param distance    The distance for which the car is supposed to move forward.
  */
 void PathFinder::moveForward(int distance) {
-
   // reset odometers
   mRightOdo->reset();
   mLeftOdo->reset();
@@ -154,20 +153,26 @@ void PathFinder::moveForward(int distance) {
   // set the car to driving
   mDrive = true;
   int currentDist = mRightOdo->getDistance() + mLeftOdo->getDistance();
-  mTargetDistance = currentDist + 2*distance;  // save twice the distance to check with the simple sum of the odometers later
+  // mTargetDistance = currentDist + 2*distance;  // save twice the distance to check with the simple sum of the odometers later
   mCar.setSpeed(mSpeed);
 }
 
 /**
  * Make the PathFinder go to the desired destination.
+ * 
+ * @param destination   The point which the PathFinder is supposed to go to
  */
-void PathFinder::goTo(Point destination) {
+void PathFinder::goToPoint(Point destination) {
   // First calculate angle and turn needed for this operation
   double dx = destination.getX() - mPos.getX();
   double dy = destination.getY() - mPos.getY();
+  int targetHeading = (int) (atan2(dx, dy) * 180 / M_PI + 0.5);       // switch x and y to count clockwise from North
+  double targetDistance = sqrt(pow(dx,2) + pow(dy, 2));
 
-  double targetHeading = atan2(dx, dy);       // switch x and y to count clockwise from North
-  
+  // initiate the journey to the target
+  rotateToHeading(targetHeading);
+  mTargetDistance = (int) targetDistance;
+  mDrive = true;
 }
 
 

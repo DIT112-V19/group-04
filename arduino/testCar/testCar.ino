@@ -30,11 +30,9 @@ void setup() {
   });
   
   // put your setup code here, to run once:
-  //Serial.begin(9600);
-  //Serial.println(pathy.getHeading(), DEC);
   startTime = millis();  // variable holding the time program start in ms
   pathy.init();
-  BLUETOOTH.begin(BAUD_RATE);
+  // BLUETOOTH.begin(BAUD_RATE);
 }
 
 
@@ -55,9 +53,6 @@ void loop() {
   if (now - startTime > PRINT_PERIOD) {
     int heading = pathy.getHeading();
     pathy.println("Hallo");
-    //BLUETOOTH.println(heading, DEC);
-    //BLUETOOTH.println(pathy.getDistance());
-    //BLUETOOTH.println(leftOdometer.getDistance());
     startTime = startTime + PRINT_PERIOD;     // prevent the printing time from drifting (would happen if it was set to now instead)
   }
 }
