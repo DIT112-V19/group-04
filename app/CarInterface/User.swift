@@ -12,8 +12,9 @@ import UIKit
 @objcMembers class User{
     
     dynamic var id: String = ""
-     var source: CGPoint!
-     var destination: CGPoint!
+    var source: CGPoint!
+    var destination: CGPoint!
+    
     
     convenience init(
         id: String,

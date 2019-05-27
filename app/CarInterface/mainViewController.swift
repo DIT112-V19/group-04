@@ -9,7 +9,7 @@
 import UIKit
 
 class mainViewController: UIViewController {
-
+    
     @IBOutlet weak var imageView: UIImageView!
     
     @IBOutlet weak var setButton: UIButton!
@@ -17,18 +17,28 @@ class mainViewController: UIViewController {
     var cgpoint:CGPoint?
     
     
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        UIApplication.shared.isStatusBarHidden = true
         loadImage()
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(imageTapped(tapGestureRecognizer:)))
         imageView.isUserInteractionEnabled = true
         imageView.addGestureRecognizer(tapGestureRecognizer)
-
-       
+        
+        
+    }
+    override var prefersStatusBarHidden: Bool {
+        return true
     }
     
     @IBAction func setButtonTapped(_ sender: Any) {
+        if UserManager.shared.theUser.source != nil {
+            UserManager.shared.theUser.destination = cgpoint
+        }else{
+            UserManager.shared.theUser.source = cgpoint
+        }
     }
     
     
@@ -38,7 +48,6 @@ class mainViewController: UIViewController {
             let topImage = locationIcon()
             imageView.image = bottomImage.imageByMergingImages(topImage: topImage, bottomImage: bottomImage)
         }
-        debugPrint(cgpoint)
     }
     
     func locationIcon() -> UIImage{
@@ -48,25 +57,25 @@ class mainViewController: UIViewController {
         }
         return im!
     }
-
+    
     func resizeImage(image: UIImage) -> UIImage? {
-
+        
         //let scale = newWidth / image.size.width
         //let newHeight = image.size.height * scale
-        print("image size ", image.size)
+        // print("image size ", image.size)
         UIGraphicsBeginImageContext(CGSize(width: image.size.width, height: image.size.height))
-        image.draw(in: CGRect(x: cgpoint!.x/1.1, y: cgpoint!.y/2, width: 12, height: 12))
-
+        image.draw(in: CGRect(x: cgpoint!.x, y: cgpoint!.y/2, width: 12, height: 12))
+        
         let newImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-
+        
         return newImage
     }
     
     
     func loadImage(){
         
-       let size = UIScreen.main.bounds.size
+        let size = UIScreen.main.bounds.size
         if let image = UIImage(named:"map (1).png") {
             let finalImage = image.scaleTo(with: size)
             self.imageView.image = finalImage
@@ -74,7 +83,6 @@ class mainViewController: UIViewController {
         }
     }
     
-
 }
 
 extension UIImage {
@@ -101,22 +109,22 @@ extension UIImage {
         return scaledImage
     }
     
-//    func resizeImage(targetSize: CGSize) -> UIImage {
-//        let size = self.size
-//        let widthRatio  = targetSize.width  / size.width
-//        let heightRatio = targetSize.height / size.height
-//        let newSize = widthRatio > heightRatio ?  CGSize(width: size.width * heightRatio, height: size.height * heightRatio) : CGSize(width: size.width / widthRatio,  height: size.height / widthRatio)
-//        let rect = CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height)
-//
-//        UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
-//        self.draw(in: rect)
-//        let newImage = UIGraphicsGetImageFromCurrentImageContext()
-//        UIGraphicsEndImageContext()
-//
-//        return newImage!
-//    }
-//
-     func imageByMergingImages(topImage: UIImage, bottomImage: UIImage, scaleForTop: CGFloat = 1.0) -> UIImage {
+    //    func resizeImage(targetSize: CGSize) -> UIImage {
+    //        let size = self.size
+    //        let widthRatio  = targetSize.width  / size.width
+    //        let heightRatio = targetSize.height / size.height
+    //        let newSize = widthRatio > heightRatio ?  CGSize(width: size.width * heightRatio, height: size.height * heightRatio) : CGSize(width: size.width / widthRatio,  height: size.height / widthRatio)
+    //        let rect = CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height)
+    //
+    //        UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
+    //        self.draw(in: rect)
+    //        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+    //        UIGraphicsEndImageContext()
+    //
+    //        return newImage!
+    //    }
+    //
+    func imageByMergingImages(topImage: UIImage, bottomImage: UIImage, scaleForTop: CGFloat = 1.0) -> UIImage {
         let size = bottomImage.size
         let container = CGRect(x: 0, y: 0, width: size.width, height: size.height)
         UIGraphicsBeginImageContextWithOptions(size, false, 1.0)

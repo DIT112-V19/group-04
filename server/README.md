@@ -7,8 +7,8 @@
 #### /pickup [POST]
 
 ###### Headers
-* Cookie = id=value (values = ['bartek', 'alex', 'konrad', 'kalle, 'kardo', 'jean'])
-* Content-Type = 'application/json'
+* Cookie: id=value | e.g. id=bartek
+* Content-Type: 'application/json'
 
 ###### Example payload
     {
@@ -16,6 +16,23 @@
         destination: [30, 50]
     }
  
+###### Example response
+    {
+        carLocation: [
+            230,
+            800
+        ]
+    }
+    
+ #### /getlocation [GET]
+
+###### Headers
+* Cookie: id=value | e.g. id=bartek
+* Content-Type: 'application/json'
+
+Note that this only works if the customer is a valid passenger.
+
+
 ###### Example response
     {
         carLocation: [

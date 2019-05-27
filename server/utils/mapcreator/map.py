@@ -1,4 +1,4 @@
-from utils import vector
+from math import sqrt, pow
 
 
 class Map:
@@ -7,7 +7,7 @@ class Map:
         self.nodes = {}
 
     def add_node(self, node, node2):
-        edge = vector.Vector(node, node2).magnitude
+        edge = sqrt(pow(node2.x - node.x, 2)+pow(node2.y - node.y, 2))
         try:
             self.nodes[node][node2] = edge
         except KeyError:
@@ -19,7 +19,7 @@ class Map:
             self.nodes[node2] = {node: edge}
 
     def add_one_way_node(self, node, node2):
-        edge = vector.Vector(node, node2).magnitude
+        edge = sqrt(pow(node2.x - node.x, 2)+pow(node2.y - node.y, 2))
         try:
             self.nodes[node][node2] = edge
         except KeyError:
