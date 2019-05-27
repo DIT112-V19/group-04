@@ -106,7 +106,7 @@ def clear_path():
     time.sleep(1)
     bluetooth.clear_path()
     print("Stop Signal sent")
-    bluetooth.send_coordinate([30, 70])
+    bluetooth.send_coordinate([0, 0])
     print("Coordinate sent")
 
 

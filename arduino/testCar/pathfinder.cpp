@@ -31,9 +31,9 @@ void PathFinder::init() {
   // TODO: remove this
   mConnection->println(mHeading, DEC);   // test connection
 
-  addPoint(Point(50, 100));
+  /*addPoint(Point(50, 100));
   addPoint(Point(50, -50));
-  addPoint(Point(0, 0));
+  addPoint(Point(0, 0));*/
 }
 
 /**
@@ -131,7 +131,22 @@ void PathFinder::parseCommand(char *command, int length) {
   if (first == '<') {
     char last = command[length - 1];
     if (last == '>') {
-      Serial.println("Wubalubadupdup");
+      // remove starter and ender of the command
+      char* sub = new char[length - 2];
+      for (int i = 0; i < length - 2; i++) {
+        sub[i] = command[i+1];
+      }
+      // split the command by the delimiter
+      char * pch1;
+      char * pch2;
+      pch1 = strtok(sub, ",");
+      pch2 = strtok(NULL, ",");
+
+      // parse to int
+      int x = atoi(pch1);
+      int y = atoi(pch2);
+
+      addPoint(Point(x, y));
     }
   }
 }
