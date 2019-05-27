@@ -2,7 +2,7 @@
 #define PATHCAR_H
 
 #include <Smartcar.h>
-#include "bluetooth.h"
+#include <HardwareSerial.h>
 #include "constants.h"
 #include "usedpins.h"
 #include "point.h"
@@ -15,11 +15,17 @@ static const int ANGLE_TOLERANCE = 5;
 static const double DEFAULT_THETA = 0.0;
 
 static const int MAX_PATH_LENGTH = 64;
+static const int BUFFER_SIZE = 64;
+
+static const char CLEAR_CMD[] = "F**K";
 
 class PathFinder {
 private:
   HeadingCar mCar;
-  Bluetooth *mConnection;
+  HardwareSerial *mConnection;
+  char mBuffer[BUFFER_SIZE];
+  int mPosition;
+  
   DirectionlessOdometer *mLeftOdo;
   DirectionlessOdometer *mRightOdo;
 
@@ -40,8 +46,8 @@ private:
   int mWritePosition = 0;
 
 public:
-  PathFinder(const HeadingCar& car, const Bluetooth *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, Point pos, int speed=SPEED);
-  PathFinder(const HeadingCar& car, const Bluetooth *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, int speed=SPEED) : 
+  PathFinder(const HeadingCar& car, const HardwareSerial *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, Point pos, int speed=SPEED);
+  PathFinder(const HeadingCar& car, const HardwareSerial *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, int speed=SPEED) : 
                 PathFinder(car, blue, leftOdo, rightOdo, Point(DEFAULT_X, DEFAULT_Y), speed){};
 
 
@@ -57,7 +63,18 @@ public:
   void init();
   void update();
   void updatePosition();
-  HardwareSerial getConnection() {return mConnection->getConnection();}
+
+  // connectivity
+  HardwareSerial getConnection() {return *mConnection;}
+  void readSerial();
+  /**
+   * Given a command in the format defined by our group 
+   * for sending information from the server to the app,
+   * find out what is expected to be done by the car.
+   * @param command   pointer to the char array containing the command
+   * @param length    length of the command contained in the char array
+   */
+  void parseCommand(char *command, int length);
 
   void println(String text);
   
@@ -66,6 +83,7 @@ public:
 
   void moveForward(int distance);
   void goToPoint(Point destination);
+  void stopCar();
 
   void clearPath();  
   void addPoint(const Point point);

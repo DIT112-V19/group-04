@@ -13,7 +13,7 @@ class Simulator:
 
         root = Tk()
         root.title("Simulator")
-        root.state("zoomed")
+        # root.state("zoomed")
         f2 = Frame(root)
         f2.grid(column=0, sticky="n")
         w = Canvas(f2, width=int(root.winfo_screenwidth()*scale), height=int(root.winfo_screenheight()*scale))

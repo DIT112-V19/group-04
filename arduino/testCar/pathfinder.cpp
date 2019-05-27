@@ -9,7 +9,7 @@
  * @param x       initial x-coordinate of the PathFinder
  * @param y       initial y-coordinate of the PathFinder
  */
-PathFinder::PathFinder(const HeadingCar& car, const Bluetooth *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, Point pos, int speed=SPEED) :
+PathFinder::PathFinder(const HeadingCar& car, const HardwareSerial *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, Point pos, int speed=SPEED) :
     mCar(car),  
     mPos(pos.getX(), pos.getY()),
     mPrev(pos.getX(), pos.getY()) {    
@@ -25,10 +25,11 @@ PathFinder::PathFinder(const HeadingCar& car, const Bluetooth *blue, const Direc
  * be executed once after creation.
  */
 void PathFinder::init() {
-  mConnection->getConnection().begin(BAUD_RATE);
+  mConnection->begin(BAUD_RATE);
+  Serial.begin(BAUD_RATE);
   
   // TODO: remove this
-  mConnection->getConnection().println(mHeading, DEC);   // test connection
+  mConnection->println(mHeading, DEC);   // test connection
 
   addPoint(Point(50, 100));
   addPoint(Point(50, -50));
@@ -44,6 +45,8 @@ void PathFinder::init() {
 void PathFinder::update() {
   mCar.update();     // update to integrate the latest heading sensor readings
   mHeading = mCar.getHeading();   // in the scale of 0 to 360
+
+  readSerial();
 
   if (mTurn) {
     // stop turning if the heading is in an acceptable range
@@ -61,9 +64,9 @@ void PathFinder::update() {
     updatePosition();    
 
     if (mDistance > mTargetDistance) {
-      mCar.setSpeed(0);
-      mDrive = false;
-      mDistance = 0;
+      Point p = mPath[mReadPosition - 1];
+      mPos.set(p.getX(), p.getY());
+      stopCar();
     }
     
   } else {
@@ -94,6 +97,43 @@ void PathFinder::updatePosition() {
   dtostrf(y,7, 3, ystring);
   sprintf(buffer, "heading: %d, mDist: %d \tx: %s \ty: %s\n", mTargetHeading, mDistance, xstring, ystring);
   println(buffer); 
+}
+
+void PathFinder::readSerial() {
+  while (mConnection->available() > 0) {
+    char data = mConnection->read();
+    if (data == '\n' || mPosition > BUFFER_SIZE-1) {
+      Serial.println(data);
+      parseCommand(mBuffer, mPosition);
+      memset(&mBuffer[0], 0, sizeof(mBuffer));    // erase the buffer's content
+      mPosition = 0;    // reset pointer
+    } else {
+      mBuffer[mPosition] = data;
+      mPosition++;
+    }
+  }
+}
+
+/** 
+ * Parse the incomming command.
+ * 
+ * This function takes any command received via serial connection,
+ * checks it for validity and triggers events if neccessary
+ */
+void PathFinder::parseCommand(char *command, int length) {
+  Serial.println(command);
+  char first = command[0];
+  if (first == 'F') {
+    if (length == 4 && strcmp(CLEAR_CMD, command) == 0) {
+      clearPath();
+    }
+  }
+  if (first == '<') {
+    char last = command[length - 1];
+    if (last == '>') {
+      Serial.println("Wubalubadupdup");
+    }
+  }
 }
 
 void PathFinder::println(String text) {
@@ -200,11 +240,21 @@ void PathFinder::goToPoint(Point destination) {
   mDrive = true;
 }
 
+void PathFinder::stopCar() {
+  mCar.setSpeed(0);
+  mTurn = false;
+  mDrive = false;
+  mDistance = 0;
+  mPrev.set(mPos.getX(), mPos.getY());
+}
+
 
 /**
  * Function to delete the current path of the path-finder.
  */
 void PathFinder::clearPath() {
+  stopCar();
+  
   for (int i = 0; i < MAX_PATH_LENGTH; i++) {
     mPath[i] = Point(0, 0);
   }
@@ -235,11 +285,7 @@ void PathFinder::setNextGoal() {
   // check whether destinations are left unhandled and go there if so
   if (mReadPosition < mWritePosition && !mDrive && !mTurn) {
     println("Setting next goal!");
-    if (mReadPosition > 0) {
-      Point p = mPath[mReadPosition - 1];
-      mPos.set(p.getX(), p.getY());
-      mPrev.set(p.getX(), p.getY());
-    }
+   
     Point destination = mPath[mReadPosition];
     mReadPosition++;
     goToPoint(destination);
