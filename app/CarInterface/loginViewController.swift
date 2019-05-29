@@ -10,29 +10,20 @@ import UIKit
 
 class loginViewController: UIViewController {
     
+    // UI elements
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var enterButton: UIButton!
-    let user = User()
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // Do any additional setup after loading the view.
+        ImageCache.shared.saveEmAll()
     }
     
+    // Assign the input text to the user object
     @IBAction func enterButtonPressed(_ sender: Any) {
         UserManager.shared.theUser.id = textField.text!
-        print(user.id)
+        print(UserManager.shared.theUser.id)
     }
-    
-    /*
-     // MARK: - Navigation
-     
-     // In a storyboard-based application, you will often want to do a little preparation before navigation
-     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-     // Get the new view controller using segue.destination.
-     // Pass the selected object to the new view controller.
-     }
-     */
     
 }

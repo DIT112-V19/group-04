@@ -19,7 +19,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter Username" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="H6O-QH-PSS">
-                                <rect key="frame" x="137" y="169" width="140" height="30"/>
+                                <rect key="frame" x="137" y="168" width="140" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -81,16 +81,16 @@
                                 <state key="normal" title="Go"/>
                                 <connections>
                                     <action selector="goButtonPressed:" destination="PIH-0E-wT8" eventType="touchUpInside" id="c6N-ME-Ut8"/>
-                                    <segue destination="xaZ-xk-LKr" kind="show" id="cj6-r5-JvC"/>
+                                    <segue destination="Rwv-uh-kJx" kind="show" id="l4K-uW-E8l"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="z7L-w4-8gC">
-                                <rect key="frame" x="189" y="578" width="30" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pq1-wx-gkv">
+                                <rect key="frame" x="146" y="527" width="122" height="64"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Get"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="22"/>
+                                <state key="normal" title="Progress"/>
                                 <connections>
-                                    <action selector="getButtonPressed:" destination="PIH-0E-wT8" eventType="touchUpInside" id="QPA-o8-lI5"/>
-                                    <segue destination="xaZ-xk-LKr" kind="show" id="V8M-H8-R9s"/>
+                                    <segue destination="Rwv-uh-kJx" kind="show" id="fJG-uZ-wvC"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -98,7 +98,6 @@
                         <viewLayoutGuide key="safeArea" id="wQp-NF-dvD"/>
                     </view>
                     <connections>
-                        <outlet property="GetButton" destination="z7L-w4-8gC" id="1yE-d0-rEC"/>
                         <outlet property="goButton" destination="4DY-8v-x6c" id="76I-Q6-SmM"/>
                     </connections>
                 </viewController>
@@ -106,34 +105,45 @@
             </objects>
             <point key="canvasLocation" x="1063.768115942029" y="132.88043478260872"/>
         </scene>
-        <!--Main View Controller-->
-        <scene sceneID="pHy-QA-oa7">
+        <!--Car View Controller-->
+        <scene sceneID="1c6-wc-F4Y">
             <objects>
-                <viewController id="xaZ-xk-LKr" customClass="mainViewController" customModule="CarInterface" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="OZx-32-7eS">
+                <viewController id="Rwv-uh-kJx" customClass="carViewController" customModule="CarInterface" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="uYv-Sa-hF6" customClass="ca">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KcC-S3-B8M">
-                                <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tBp-7w-kpG">
+                                <rect key="frame" x="0.0" y="0.0" width="413" height="736"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
                             </imageView>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Uez-5t-ihP">
+                                <rect key="frame" x="20" y="20" width="66" height="50"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="21"/>
+                                <state key="normal" title="Back"/>
+                                <connections>
+                                    <action selector="backButtonPressed:" destination="Rwv-uh-kJx" eventType="touchUpInside" id="ea9-g3-4JO"/>
+                                    <segue destination="PIH-0E-wT8" kind="show" id="OTe-dP-67a"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <viewLayoutGuide key="safeArea" id="Cme-Ym-L3H"/>
+                        <viewLayoutGuide key="safeArea" id="UHW-yg-nEd"/>
                     </view>
                     <connections>
-                        <outlet property="imageView" destination="KcC-S3-B8M" id="NdQ-ey-m7q"/>
+                        <outlet property="backButton" destination="Uez-5t-ihP" id="g2v-Bs-0TC"/>
+                        <outlet property="imageView" destination="tBp-7w-kpG" id="y7w-Q3-j4B"/>
                     </connections>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Eot-rT-Iii" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="muY-kK-KXg" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1064" y="875"/>
+            <point key="canvasLocation" x="1063.768115942029" y="962.77173913043487"/>
         </scene>
-        <!--Main View Controller-->
+        <!--Map View Controller-->
         <scene sceneID="LFN-36-XZG">
             <objects>
-                <viewController id="6Eh-Lf-AQJ" customClass="mainViewController" customModule="CarInterface" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="6Eh-Lf-AQJ" customClass="mapViewController" customModule="CarInterface" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="u37-KA-6Qn">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -176,7 +186,7 @@
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="dOk-aV-H8h"/>
-        <segue reference="cj6-r5-JvC"/>
-        <segue reference="tVl-I7-MSD"/>
+        <segue reference="l4K-uW-E8l"/>
+        <segue reference="OTe-dP-67a"/>
     </inferredMetricsTieBreakers>
 </document>
