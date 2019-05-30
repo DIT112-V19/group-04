@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  Node.swift
 //  CarInterface
 //
 //  Created by Kardo Dastin on 2019-05-14.
@@ -8,20 +8,17 @@
 
 import Foundation
 import UIKit
-
-@objcMembers class User{
+@objcMembers class node {
     
     dynamic var id: String = ""
-    var source: CGPoint!
-    var destination: CGPoint!
-    
+   dynamic var source: CGPoint
+   dynamic var destination: CGPoint
     
     convenience init(
         id: String,
         source: CGPoint,
         destination: CGPoint
         ){
-        self.init(id: id, source: source, destination: destination)
         self.id = id
         self.source = source
         self.destination = destination

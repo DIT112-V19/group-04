@@ -12,16 +12,12 @@ import UIKit
 
 @objcMembers class Car{
     
-    dynamic var id: String = ""
+    dynamic var id: String = UUID.init().uuidString
     var location: CGPoint!
     
     
-    convenience init(
-        id: String,
-        location: CGPoint
-        ){
-        self.init(id: id, location: location)
-        self.id = id
+    convenience init(location: CGPoint){
+        self.init(location: location)
         self.location = location
     }
 }

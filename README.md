@@ -38,4 +38,4 @@ You can either use the one provided with the server, or you can create your own 
 
 ## Software:
 * Android Studio
-* Arduino IDE
+* Arduino IDE 
