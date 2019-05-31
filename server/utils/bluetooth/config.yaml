@@ -4,5 +4,5 @@ computers:
   edi:      # name of the used computer
     usb: /dev/ttyACM1
     usb_port: 1
-    bluetooth: /dev/rfcomm0
+    bluetooth: /dev/rfcomm28
     bluetooth_port: 1

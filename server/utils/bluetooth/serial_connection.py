@@ -1,5 +1,7 @@
 from serial import Serial
 from utils.bluetooth import module_config, host_pc
+import time as time
+from utils import Coordinate
 
 CLEAR = "F**K"
 APPENDER = "<"
@@ -7,7 +9,8 @@ SEPARATOR = ","
 CLOSER = ">"
 END_COMMAND = "\n"
 
-class SerialConnection(Serial):
+
+class SerialConnection():
     """Class to establish a serial connection to the SmartCar and transmit & receive data.
 
     The class is ideally using the configuration to adapt to the used device.
@@ -22,6 +25,8 @@ class SerialConnection(Serial):
         if connection_type not in ['bluetooth', 'usb']:
             raise Exception('Connection type \'' + connection_type + '\' is not supported')
 
+        self.buffer = "";
+
         self.serial_settings = module_config['computers'][host_pc]
         self.Serial = Serial(self.serial_settings[connection_type])
         self.Serial.reset_input_buffer()    # disregard everything sent before the connection has benn established
@@ -32,7 +37,26 @@ class SerialConnection(Serial):
 
         :return:
         """
-        return self.Serial.read()
+        try:
+            while self.Serial.in_waiting:
+                c = self.Serial.read().decode()
+                if c != "\n":
+                    self.buffer += c
+                else:
+                    return self.parseTelemetry()
+        except:
+            pass
+
+        return None
+
+    def parseTelemetry(self):
+        telemetry = self.buffer
+        self.buffer = ""
+        if telemetry[0] == '<':
+            if telemetry[len(telemetry) - 1] == '>':
+                values = telemetry[1:len(telemetry)-1].split(',')
+                coord = Coordinate(int(values[0]), int(values[1]))
+                return coord
 
     def write(self, msg):
         """Write a message to the specified serial_port.
@@ -47,8 +71,8 @@ class SerialConnection(Serial):
 
         :param coordinate: coordinate to be appended to the SmartCar path.
         """
-        x = coordinate[0]
-        y = coordinate[1]
+        x = coordinate.x
+        y = coordinate.y
         msg = APPENDER + str(x) + SEPARATOR + str(y) + CLOSER + END_COMMAND      # format the coordinate
         self.write(msg)
 
@@ -68,4 +92,6 @@ class SerialConnection(Serial):
         self.clear_path()
         for coordinate in path:
             self.send_coordinate(coordinate)
+            time.sleep(0.05)
+
 

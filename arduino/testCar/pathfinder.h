@@ -14,10 +14,15 @@ static const int ANGLE_TOLERANCE = 5;
 
 static const double DEFAULT_THETA = 0.0;
 
-static const int MAX_PATH_LENGTH = 64;
+static const int MAX_PATH_LENGTH = 100;
 static const int BUFFER_SIZE = 64;
 
+static const int SCALE = 10;
+
 static const char CLEAR_CMD[] = "F**K";
+static const char APPENDER = '<';
+static const char SEPARATOR = ',';
+static const char CLOSER = '>';
 
 class PathFinder {
 private:
@@ -25,6 +30,7 @@ private:
   HardwareSerial *mConnection;
   char mBuffer[BUFFER_SIZE];
   int mPosition;
+  bool mPublishPos = true;
   
   DirectionlessOdometer *mLeftOdo;
   DirectionlessOdometer *mRightOdo;
@@ -36,7 +42,7 @@ private:
   int mDistance = 0;
 
   bool mTurn = false;
-  int mTargetHeading = 0;
+  int mTargetHeading = 45;
   
   bool mDrive = false;
   int mTargetDistance = 0; 
@@ -52,6 +58,7 @@ public:
 
 
   Point getPos() {return mPos;}
+  void publishPos() {mPublishPos = true;};
   int getHeading() {return mHeading;};
   int getDistance() {return mDistance;};
   int getTargetDistance() {return mTargetDistance;};
@@ -66,6 +73,7 @@ public:
 
   // connectivity
   HardwareSerial getConnection() {return *mConnection;}
+  void publishPosition();
   void readSerial();
   /**
    * Given a command in the format defined by our group 

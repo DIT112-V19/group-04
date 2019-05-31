@@ -15,7 +15,7 @@ DirectionlessOdometer leftOdometer(200), rightOdometer(200);
 GY50 gyroscope(GYROSCOPE_OFFSET);
 
 HeadingCar car(control, gyroscope);
-PathFinder pathy(car, &Serial3, &leftOdometer, &rightOdometer, Point(DEFAULT_X, DEFAULT_Y));
+PathFinder pathy(car, &Serial3, &leftOdometer, &rightOdometer, Point(30, 2));
 
 unsigned long startTime;
 
@@ -51,7 +51,7 @@ void loop() {
   // print only every PRINT_PERIOD
   if (now - startTime > PRINT_PERIOD) {
     int heading = pathy.getHeading();
-    pathy.println("Hallo");
+    pathy.publishPos();
     startTime = startTime + PRINT_PERIOD;     // prevent the printing time from drifting (would happen if it was set to now instead)
   }
 }

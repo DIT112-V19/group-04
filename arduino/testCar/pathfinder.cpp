@@ -27,13 +27,8 @@ PathFinder::PathFinder(const HeadingCar& car, const HardwareSerial *blue, const 
 void PathFinder::init() {
   mConnection->begin(BAUD_RATE);
   Serial.begin(BAUD_RATE);
-  
-  // TODO: remove this
-  mConnection->println(mHeading, DEC);   // test connection
 
-  /*addPoint(Point(50, 100));
-  addPoint(Point(50, -50));
-  addPoint(Point(0, 0));*/
+  // goToPoint(Point(1000, 500));
 }
 
 /**
@@ -67,12 +62,31 @@ void PathFinder::update() {
       Point p = mPath[mReadPosition - 1];
       mPos.set(p.getX(), p.getY());
       stopCar();
+      publishPosition();
+      mPublishPos = false;
     }
     
   } else {
     // set the next goal if the current goal has been reached
     setNextGoal();
   }
+
+
+  if (mPublishPos == true) {
+    updatePosition();
+  }
+  /*if (mPublishPos == true) {
+    publishPosition();
+    mPublishPos = false;    
+  }*/
+}
+
+void PathFinder::publishPosition() {
+  int x = (int) (mPos.getX() + 0.5);
+  int y = (int) (mPos.getY() + 0.5);
+  char outString [BUFFER_SIZE];
+  sprintf(outString, "%c%d%c%d%c\n", APPENDER, x, SEPARATOR, y, CLOSER);
+  mConnection->print(outString);
 }
 
 /**
@@ -80,7 +94,9 @@ void PathFinder::update() {
  */
 void PathFinder::updatePosition() {
   mDistance = mRightOdo->getDistance() + mLeftOdo->getDistance();
+  mDistance *= SCALE;
   double radHead = ((double) mTargetHeading) * M_PI / 180.0;
+
   double dist = (double) mDistance;
   dist *= 0.5;
   double dx = dist * sin(radHead); 
@@ -90,20 +106,12 @@ void PathFinder::updatePosition() {
   double y = mPrev.getY() + dy;
   
   mPos.set(x, y);
-  char buffer[50];
-  char xstring[7];
-  char ystring[7];
-  dtostrf(x,7, 3, xstring);
-  dtostrf(y,7, 3, ystring);
-  sprintf(buffer, "heading: %d, mDist: %d \tx: %s \ty: %s\n", mTargetHeading, mDistance, xstring, ystring);
-  println(buffer); 
 }
 
 void PathFinder::readSerial() {
   while (mConnection->available() > 0) {
     char data = mConnection->read();
     if (data == '\n' || mPosition > BUFFER_SIZE-1) {
-      Serial.println(data);
       parseCommand(mBuffer, mPosition);
       memset(&mBuffer[0], 0, sizeof(mBuffer));    // erase the buffer's content
       mPosition = 0;    // reset pointer
@@ -121,32 +129,41 @@ void PathFinder::readSerial() {
  * checks it for validity and triggers events if neccessary
  */
 void PathFinder::parseCommand(char *command, int length) {
-  Serial.println(command);
+  String str(command);
   char first = command[0];
+  Serial.println(str);
   if (first == 'F') {
     if (length == 4 && strcmp(CLEAR_CMD, command) == 0) {
       clearPath();
     }
   }
-  if (first == '<') {
-    char last = command[length - 1];
-    if (last == '>') {
+  if (first == APPENDER) {
+    char last = str.charAt(length - 1);
+    Serial.println(last);
+    if (last == CLOSER) {
       // remove starter and ender of the command
-      char* sub = new char[length - 2];
+      String sub;
       for (int i = 0; i < length - 2; i++) {
-        sub[i] = command[i+1];
+        sub += command[i+1];
       }
-      // split the command by the delimiter
-      char * pch1;
-      char * pch2;
-      pch1 = strtok(sub, ",");
-      pch2 = strtok(NULL, ",");
 
+      // split the command by the delimiter
+      int delimiter = sub.indexOf(SEPARATOR);
+      String xstr;
+      String ystr;
+
+      xstr = sub.substring(0, delimiter);
+      ystr = sub.substring(delimiter+1);
+      
       // parse to int
-      int x = atoi(pch1);
-      int y = atoi(pch2);
+      int x = xstr.toInt();
+      int y = ystr.toInt();
+
+      Serial.println(x);
+      Serial.println(y);
 
       addPoint(Point(x, y));
+      //delete[] sub;
     }
   }
 }
@@ -246,8 +263,9 @@ void PathFinder::goToPoint(Point destination) {
   // First calculate angle and turn needed for this operation
   double dx = destination.getX() - mPos.getX();
   double dy = destination.getY() - mPos.getY();
-  int targetHeading = (int) (atan2(dx, dy) * 180 / M_PI + 0.5);       // switch x and y to count clockwise from North
-  double targetDistance = sqrt(pow(dx,2) + pow(dy, 2));
+  int targetHeading = (int) (atan2(dx, dy) * 180.0 / M_PI + 0.5);       // switch x and y to count clockwise from North
+  
+  double targetDistance = sqrt(pow(dx, 2) + pow(dy, 2));
 
   // initiate the journey to the target
   rotateToHeading(targetHeading);
@@ -287,7 +305,7 @@ void PathFinder::addPoint(const Point point) {
     mPath[mWritePosition] = point;
     mWritePosition++;
   } else {
-    mConnection->println("The path has maximum length. No more points can be added to it.");
+    // mConnection->println("The path has maximum length. No more points can be added to it.");
   }
 }
 
@@ -299,7 +317,7 @@ void PathFinder::addPoint(const Point point) {
 void PathFinder::setNextGoal() {
   // check whether destinations are left unhandled and go there if so
   if (mReadPosition < mWritePosition && !mDrive && !mTurn) {
-    println("Setting next goal!");
+    //println("Setting next goal!");
    
     Point destination = mPath[mReadPosition];
     mReadPosition++;

@@ -12,8 +12,7 @@ const int BAUD_RATE = 9600;
 const int GYROSCOPE_OFFSET = 37;
 
 // speed
-const int SPEED = 30;
-
+const int SPEED = 25;
 
 
 // printing 

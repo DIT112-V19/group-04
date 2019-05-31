@@ -5,6 +5,7 @@ class Car:
         self.id = id
         self.location = location
         self.coordinates = [location]
+        self.visited = []
         self.destinations = []
         self.passengers = []
 

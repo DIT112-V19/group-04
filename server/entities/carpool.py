@@ -13,10 +13,12 @@ MAXIMUM_ALLOWED_PASSENGERS = 4
 
 class Carpool:
 
-    def __init__(self):
+    def __init__(self, connection):
         self.users = []
         self.cars = []
         self.graph = {}
+        self.connection = connection
+        self.OUR_SMART_CAR = "Car 1"
 
     def find_car(self, id):
         for car in self.cars:
@@ -124,6 +126,15 @@ class Carpool:
 
             selected_car.destinations = selected_destinations
             selected_car.coordinates = selected_array
+
+            # If the car is the one represented by our SmartCar, we forward the new path
+            print(selected_car.id)
+
+            if selected_car.id == self.OUR_SMART_CAR:
+                print(selected_car.coordinates)
+                selected_car.coordinates.pop(0)
+                self.connection.send_path(selected_car.coordinates)
+
             return selected_car
 
         else:
