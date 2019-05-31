@@ -13,7 +13,7 @@ class httpManager {
     
     static let shared = httpManager()
     init() {}
-    private let url = "https://loci.serveo.net/"
+    private let url = "https://carpool.serveo.net/"
     private let getCall = "api/getlocation"
     private let postCall = "api/pickup"
     private var car = carManager.shared
