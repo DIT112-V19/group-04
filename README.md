@@ -45,8 +45,9 @@ To be able to run the server you need the following:
 
 To be able to run the IOS app you need the following:
 
-* Xcode
-* Valid apple id
+* Xcode (simulator)
+* Apple iPhone - iOS 11.0 (or above)
+* Developer apple id (free dev-account work as well)
 
 
 ## IOS Application
@@ -57,8 +58,3 @@ To be able to run the IOS app you need the following:
 * Tap on source to insert the location where you desire the car to pick you up. Once that's done, tap on SET.
 * Tap on destination to insert the location where you desire the car to drop you. Once that's done, tap on SET.
 * Finally, tap 'GO' to get a visualisation of your location, destination, as well as the vihicle which is on the way.
-
-## Software:
-* Android Studio
-* Arduino IDE 
-* Xcode (IOS client)
