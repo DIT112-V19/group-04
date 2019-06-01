@@ -18,6 +18,8 @@ The arduino prototype vehicle is based on the Smartcar shield platform which can
 * [The Smartcar platform](http://plat.is/smartcar)
 
 The server and  it's additional features is written in python.
+The IOS client is written in Swift.
+
 
 ## Requirements
 To be able to run the server you need the following:
@@ -36,6 +38,27 @@ In order to temporarily forward your port and make it accessible for other devic
 The service itself also requires a graph of a map.
 You can either use the one provided with the server, or you can create your own using the mapcreator in the server/utils/mapcreator folder. 
 
+To be able to run the server you need the following:
+
+* Python 3 or newer
+* Virtualenv
+
+To be able to run the IOS app you need the following:
+
+* Xcode
+* Valid apple id
+
+
+## IOS Application
+
+* Import Xcode project.
+* Choose a device or simulator to build and run the Application.
+* Create a username and press login.
+* Tap on source to insert the location where you desire the car to pick you up. Once that's done, tap on SET.
+* Tap on destination to insert the location where you desire the car to drop you. Once that's done, tap on SET.
+* Finally, tap 'GO' to get a visualisation of your location, destination, as well as the vihicle which is on the way.
+
 ## Software:
 * Android Studio
 * Arduino IDE 
+* Xcode (IOS client)
