@@ -5,8 +5,6 @@
 
 #define DEBUG
 
-const int carSpeed = 50; // 50% of the max speed
-
 // classes to control the car
 BrushedMotor leftMotor(BRUSHED_LEFT_FORWARD_PIN, BRUSHED_LEFT_BACKWARD_PIN, BRUSHED_LEFT_ENABLE_PIN);
 BrushedMotor rightMotor(BRUSHED_RIGHT_FORWARD_PIN, BRUSHED_RIGHT_BACKWARD_PIN, BRUSHED_RIGHT_ENABLE_PIN);
@@ -53,8 +51,6 @@ void setup() {
  */
 void loop() {  
   pathy.update();   // update everything on the pathfinder -- this controls what the car does
-
-  #ifdef DEBUG
   unsigned long now = millis();   // get the current time in ms
   
   // print only every PRINT_PERIOD
@@ -63,5 +59,4 @@ void loop() {
     pathy.publishPos();
     startTime = startTime + PRINT_PERIOD;     // prevent the printing time from drifting (would happen if it was set to now instead)
   }
-  #endif
 }

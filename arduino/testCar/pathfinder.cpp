@@ -4,10 +4,13 @@
  * Constructor of a PathFinder car using a HeadingCar and a Bluetooth connection
  * for control and communication.
  * 
- * @param car     HeadingCar used for steering the PathFinder
- * @param blue    Bluetooth connection used for communication
- * @param x       initial x-coordinate of the PathFinder
- * @param y       initial y-coordinate of the PathFinder
+ * @param car        HeadingCar used for steering the PathFinder
+ * @param blue       Bluetooth connection used for communication
+ * @param leftOdo    Pointer to the left odometer installed on the car
+ * @param rightOdo   Pointer to the right odometer installed on the car
+ * @param ultrasound Pointer to the distance sensor installed on the car
+ * @param pos        initial position of the PathFinder
+ * @param speed      speed used when driving
  */
 PathFinder::PathFinder(const HeadingCar& car, const HardwareSerial *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, const SR04 *ultrasound, Point pos, int speed=SPEED) :
     mCar(car),  
@@ -16,7 +19,7 @@ PathFinder::PathFinder(const HeadingCar& car, const HardwareSerial *blue, const 
       mConnection = blue;
       mLeftOdo = leftOdo;
       mRightOdo = rightOdo;  
-      frontDist = ultrasound;
+      mFrontDist = ultrasound;
       mSpeed = smartcarlib::utils::getAbsolute(speed);
     }
 
@@ -43,57 +46,49 @@ void PathFinder::init() {
 void PathFinder::update() {
   mCar.update();     // update to integrate the latest heading sensor readings
   mHeading = mCar.getHeading();   // in the scale of 0 to 360
-
+  
   readSerial();
 
-  if (mTurn) {
-    // stop turning if the heading is in an acceptable range
-    int diff =  abs(mTargetHeading - mHeading);
-    if (diff < ANGLE_TOLERANCE || diff > DEG_IN_CIRCLE - ANGLE_TOLERANCE) {
-      mCar.setSpeed(0);
-      mTurn = false;
-      if (mDrive) {
-        moveForward(mTargetDistance);        
+  if (!checkDist()) {
+    if (mTurn) {
+      // stop turning if the heading is in an acceptable range
+      int diff =  abs(mTargetHeading - mHeading);
+      if (diff < ANGLE_TOLERANCE || diff > DEG_IN_CIRCLE - ANGLE_TOLERANCE) {
+        mCar.setSpeed(0);
+        mTurn = false;
+        if (mDrive) {
+          moveForward(mTargetDistance);        
+        }
       }
+      
+    } else if (mDrive) {
+      // stop heading forward if the required distance has been passed
+      updatePosition();    
+  
+      if (mDistance > mTargetDistance) {
+        Point p = mPath[mReadPosition - 1];
+        mPos.set(p.getX(), p.getY());
+        stopCar();
+        publishPosition();
+        mPublishPos = false;
+      }
+      
+    } else {
+      // set the next goal if the current goal has been reached
+      setNextGoal();
     }
-    
-  } else if (mDrive) {
-    // stop heading forward if the required distance has been passed
-    updatePosition();    
-
-    if (mDistance > mTargetDistance) {
-      Point p = mPath[mReadPosition - 1];
-      mPos.set(p.getX(), p.getY());
-      stopCar();
-      publishPosition();
-      mPublishPos = false;
-    }
-    
-  } else {
-    // set the next goal if the current goal has been reached
-    setNextGoal();
   }
 
-
+  // calculate and share the current position if requested
   if (mPublishPos == true) {
     updatePosition();
-  }
-  /*if (mPublishPos == true) {
     publishPosition();
     mPublishPos = false;    
-  }*/
-}
-
-void PathFinder::publishPosition() {
-  int x = (int) (mPos.getX() + 0.5);
-  int y = (int) (mPos.getY() + 0.5);
-  char outString [BUFFER_SIZE];
-  sprintf(outString, "%c%d%c%d%c\n", APPENDER, x, SEPARATOR, y, CLOSER);
-  mConnection->print(outString);
+  }
 }
 
 /**
- * Function to update the current position of the PathFinder according to its path.
+ * Calculate the current position of the PathFinder
  */
 void PathFinder::updatePosition() {
   mDistance = mRightOdo->getDistance() + mLeftOdo->getDistance();
@@ -111,6 +106,45 @@ void PathFinder::updatePosition() {
   mPos.set(x, y);
 }
 
+/**
+ * Check the current reading of the ultrasound sensor and react to it
+ * 
+ * @return    boolean specifying whether there is a proximity alert
+ */
+bool PathFinder::checkDist() {
+  int dist = mFrontDist->getDistance();
+  if (!mProximityAlert) {
+    // stop  car and set alert if necessary
+    if (dist < US_SAFETY_DIST && dist > 0) {
+      int speed = STOP_SPEED;
+      mCar.setSpeed(speed);
+      mProximityAlert = true;
+    }
+  } else {
+    if (dist > US_SAFETY_DIST) {
+      if (mDestination != NULL) {
+        goToPoint(*mDestination);
+      }
+      mProximityAlert = false;
+    }
+  }
+  return mProximityAlert;
+}
+
+/**
+ * Publish the current position of the PathFinder
+ */
+void PathFinder::publishPosition() {
+  int x = (int) (mPos.getX() + 0.5);
+  int y = (int) (mPos.getY() + 0.5);
+  char outString [BUFFER_SIZE];
+  sprintf(outString, "%c%d%c%d%c\n", APPENDER, x, SEPARATOR, y, CLOSER);
+  mConnection->print(outString);
+}
+
+/**
+ * Read and process incoming data from the serial connection
+ */
 void PathFinder::readSerial() {
   while (mConnection->available() > 0) {
     char data = mConnection->read();
@@ -119,17 +153,20 @@ void PathFinder::readSerial() {
       memset(&mBuffer[0], 0, sizeof(mBuffer));    // erase the buffer's content
       mPosition = 0;    // reset pointer
     } else {
+      // extend the buffer with the incoming data
       mBuffer[mPosition] = data;
       mPosition++;
     }
   }
 }
 
-/** 
- * Parse the incomming command.
+/**
+ * Given a command in the format defined by our group 
+ * for sending information from the server to the app,
+ * find out what is expected to be done by the car.
  * 
- * This function takes any command received via serial connection,
- * checks it for validity and triggers events if neccessary
+ * @param command   pointer to the char array containing the command
+ * @param length    length of the command contained in the char array
  */
 void PathFinder::parseCommand(char *command, int length) {
   String str(command);
@@ -169,10 +206,6 @@ void PathFinder::parseCommand(char *command, int length) {
       //delete[] sub;
     }
   }
-}
-
-void PathFinder::println(String text) {
-  mConnection->println(text);
 }
 
 /**
@@ -276,6 +309,9 @@ void PathFinder::goToPoint(Point destination) {
   mDrive = true;
 }
 
+/**
+ * Stop the car
+ */
 void PathFinder::stopCar() {
   mCar.setSpeed(0);
   mTurn = false;
@@ -296,6 +332,7 @@ void PathFinder::clearPath() {
   }
   mReadPosition = 0;
   mWritePosition = 0;  
+  mDestination = NULL;
 }
 
 /**
@@ -308,7 +345,9 @@ void PathFinder::addPoint(const Point point) {
     mPath[mWritePosition] = point;
     mWritePosition++;
   } else {
-    // mConnection->println("The path has maximum length. No more points can be added to it.");
+    #ifdef DEBUG
+    mConnection->println("The path has maximum length. No more points can be added to it.");
+    #endif
   }
 }
 
@@ -322,9 +361,9 @@ void PathFinder::setNextGoal() {
   if (mReadPosition < mWritePosition && !mDrive && !mTurn) {
     //println("Setting next goal!");
    
-    Point destination = mPath[mReadPosition];
+    *mDestination = mPath[mReadPosition];
     mReadPosition++;
-    goToPoint(destination);
+    goToPoint(*mDestination);
   }
 }
 
