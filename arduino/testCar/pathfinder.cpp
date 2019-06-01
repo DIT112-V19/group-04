@@ -9,13 +9,14 @@
  * @param x       initial x-coordinate of the PathFinder
  * @param y       initial y-coordinate of the PathFinder
  */
-PathFinder::PathFinder(const HeadingCar& car, const HardwareSerial *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, Point pos, int speed=SPEED) :
+PathFinder::PathFinder(const HeadingCar& car, const HardwareSerial *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, const SR04 *ultrasound, Point pos, int speed=SPEED) :
     mCar(car),  
     mPos(pos.getX(), pos.getY()),
     mPrev(pos.getX(), pos.getY()) {    
       mConnection = blue;
       mLeftOdo = leftOdo;
       mRightOdo = rightOdo;  
+      frontDist = ultrasound;
       mSpeed = smartcarlib::utils::getAbsolute(speed);
     }
 
@@ -25,10 +26,12 @@ PathFinder::PathFinder(const HeadingCar& car, const HardwareSerial *blue, const 
  * be executed once after creation.
  */
 void PathFinder::init() {
+  // initialise the serial connection
   mConnection->begin(BAUD_RATE);
-  Serial.begin(BAUD_RATE);
-
-  // goToPoint(Point(1000, 500));
+  
+  #ifdef DEBUG
+  Serial.begin(BAUD_RATE);    // initialise serial connection for usb-debug
+  #endif
 }
 
 /**

@@ -3,6 +3,8 @@
 #include "constants.h"
 #include "usedpins.h"
 
+#define DEBUG
+
 const int carSpeed = 50; // 50% of the max speed
 
 // classes to control the car
@@ -11,27 +13,34 @@ BrushedMotor rightMotor(BRUSHED_RIGHT_FORWARD_PIN, BRUSHED_RIGHT_BACKWARD_PIN, B
 DifferentialControl control(leftMotor, rightMotor);
 
 // sensors on the car
-DirectionlessOdometer leftOdometer(200), rightOdometer(200);
-GY50 gyroscope(GYROSCOPE_OFFSET);
+DirectionlessOdometer leftOdometer(200), rightOdometer(200);    // two odometers
+GY50 gyroscope(GYROSCOPE_OFFSET);     // gyroscope
+SR04 frontUltrasound(US_TRIGGER_PIN, US_ECHO_PIN, US_MAX_DISTANCE);   // ultra sound distance sensor
 
+// HeadingCar and PathFinder derived from it
 HeadingCar car(control, gyroscope);
-PathFinder pathy(car, &Serial3, &leftOdometer, &rightOdometer, Point(30, 2));
+PathFinder pathy(car, &Serial3, &leftOdometer, &rightOdometer, &frontUltrasound, Point(30, 2));
 
+// variable to store the time at program start in ms
 unsigned long startTime;
 
+
+/**
+ * Set up the odometers and initialise the car before starting the program
+ */
 void setup() {
-  // set up interrupts for the odometers
+  // set up interrupts for the odometers (doesn't work from the PathFinder init)
   leftOdometer.attach(ODOM_LEFT_PIN, []() {
     leftOdometer.update();
   });
   rightOdometer.attach(ODOM_RIGHT_PIN, []() {
     rightOdometer.update();
   });
-  
-  // put your setup code here, to run once:
-  startTime = millis();  // variable holding the time program start in ms
+
+  // initialise the PathFinder
   pathy.init();
-  // BLUETOOTH.begin(BAUD_RATE);
+  
+  startTime = millis();
 }
 
 
@@ -42,16 +51,17 @@ void setup() {
  * This ensures that the single thread used for the application can handle all
  * situations immediately.
  */
-void loop() {
-  // put your main code here, to run repeatedly:
-  
-  unsigned long now = millis();   // get the current time in ms
+void loop() {  
   pathy.update();   // update everything on the pathfinder -- this controls what the car does
 
+  #ifdef DEBUG
+  unsigned long now = millis();   // get the current time in ms
+  
   // print only every PRINT_PERIOD
   if (now - startTime > PRINT_PERIOD) {
     int heading = pathy.getHeading();
     pathy.publishPos();
     startTime = startTime + PRINT_PERIOD;     // prevent the printing time from drifting (would happen if it was set to now instead)
   }
+  #endif
 }

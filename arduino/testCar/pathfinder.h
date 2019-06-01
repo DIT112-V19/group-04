@@ -27,13 +27,15 @@ static const char CLOSER = '>';
 class PathFinder {
 private:
   HeadingCar mCar;
-  HardwareSerial *mConnection;
+  const HardwareSerial *mConnection;
   char mBuffer[BUFFER_SIZE];
   int mPosition;
   bool mPublishPos = true;
   
-  DirectionlessOdometer *mLeftOdo;
-  DirectionlessOdometer *mRightOdo;
+  const DirectionlessOdometer *mLeftOdo;
+  const DirectionlessOdometer *mRightOdo;
+
+  const SR04 *frontDist;
 
   Point mPos = Point(0, 0);
   Point mPrev = Point(0, 0);
@@ -52,9 +54,9 @@ private:
   int mWritePosition = 0;
 
 public:
-  PathFinder(const HeadingCar& car, const HardwareSerial *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, Point pos, int speed=SPEED);
-  PathFinder(const HeadingCar& car, const HardwareSerial *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, int speed=SPEED) : 
-                PathFinder(car, blue, leftOdo, rightOdo, Point(DEFAULT_X, DEFAULT_Y), speed){};
+  PathFinder(const HeadingCar& car, const HardwareSerial *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, const SR04 *ultrasound,  Point pos, int speed=SPEED);
+  PathFinder(const HeadingCar& car, const HardwareSerial *blue, const DirectionlessOdometer *leftOdo, const DirectionlessOdometer *rightOdo, const SR04 *ultrasound, int speed=SPEED) : 
+                PathFinder(car, blue, leftOdo, rightOdo, ultrasound, Point(DEFAULT_X, DEFAULT_Y), speed){};
 
 
   Point getPos() {return mPos;}
