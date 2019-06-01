@@ -10,8 +10,14 @@ private:
   double my;
 
 public:
-  Point();
-  Point(double x, double y);
+  /**
+   * Standard constructor for Point objects.
+   * 
+   * Create a point at the coordinates (x,y)
+   * @param x   x-coordinate of the point
+   * @param y   y-coordinate of the point
+   */
+  Point(double x=DEFAULT_X, double y=DEFAULT_Y);
 
   double getX() {return mx;};
   void setX(double x) {mx = x;};
@@ -19,6 +25,5 @@ public:
   void setY(double y) {my = y;};
   void set(double x, double y) {setX(x); setY(y);};
 };
-
 
 #endif
