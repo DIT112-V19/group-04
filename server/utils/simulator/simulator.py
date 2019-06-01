@@ -6,7 +6,7 @@ class Simulator:
     # currently limited to 5 cars
     # this is just a testing purpose software, not to be confused with something good
 
-    def __init__(self, carpool):
+    def __init__(self, carpool, *args):
         self.pathState = 0
 
         scale = 1
@@ -53,4 +53,6 @@ class Simulator:
             root.after(2500, draw_path)
 
         draw_path()
+        for arg in args:
+            arg[0] = True
         root.mainloop()

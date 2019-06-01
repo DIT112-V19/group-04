@@ -15,7 +15,7 @@ static const double DEFAULT_THETA = 0.0;
 static const int MAX_PATH_LENGTH = 100;
 static const int BUFFER_SIZE = 64;
 
-static const int SCALE = 10;
+static const int SCALE = 4;
 
 class PathFinder {
 private:
@@ -45,7 +45,8 @@ private:
   int mTargetDistance = 0; 
 
   Point mPath[MAX_PATH_LENGTH];
-  Point *mDestination = NULL;
+  Point mDestination;
+  bool mHasDestination = false;
   int mReadPosition = 0;
   int mWritePosition = 0;
 

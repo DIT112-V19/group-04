@@ -34,8 +34,9 @@ class SerialConnection():
 
     def read(self):
         """
+        Read and parse the commands received from the server via serial connection
 
-        :return:
+        :return: A coordinate from the serial stream if parsed correctly
         """
         try:
             while self.Serial.in_waiting:
@@ -43,13 +44,13 @@ class SerialConnection():
                 if c != "\n":
                     self.buffer += c
                 else:
-                    return self.parseTelemetry()
+                    return self.parse_telemetry()
         except:
             pass
 
         return None
 
-    def parseTelemetry(self):
+    def parse_telemetry(self):
         telemetry = self.buffer
         self.buffer = ""
         if telemetry[0] == '<':
@@ -57,6 +58,7 @@ class SerialConnection():
                 values = telemetry[1:len(telemetry)-1].split(',')
                 coord = Coordinate(int(values[0]), int(values[1]))
                 return coord
+        return None
 
     def write(self, msg):
         """Write a message to the specified serial_port.
