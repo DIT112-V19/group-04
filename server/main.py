@@ -5,11 +5,15 @@ from entities.carpool import Carpool
 from entities.user import User
 from entities.car import Car
 from threading import Thread
+from utils.bluetooth.serial_connection import SerialConnection
+import time as time
+from utils import Coordinate
 import pickle
 
-
 app = Flask(__name__)
-carpool = Carpool()
+bluetooth = SerialConnection('bluetooth')
+carpool = Carpool(bluetooth)
+
 
 
 @app.route('/api')
@@ -22,6 +26,7 @@ def get_all_data():
 @app.route('/api/pickup', methods=['POST'])
 def pickup():
 
+    global smart_car
     # Retrieves the cookie header and splits the string so only the value remains
     user_id = request.headers['Cookie'][3:]
 
@@ -42,6 +47,7 @@ def pickup():
     if car:
         # If a car was found for the customer, then this customer is added as a passenger.
         car.add_passenger(user)
+
         # This returns the location of the car that was found.
         return jsonify({"carLocation": car.location.json()}), 200
 
@@ -89,15 +95,29 @@ def run_car_mover():
 
 
 def run_simulator():
-    sim = simulator.Simulator(carpool)
+    simulator.Simulator(carpool)
+
+
+def update_coordinates():
+
+    while True:
+        pos = bluetooth.read()      # read all characters available via bluetooth
+        if pos:
+            for car in carpool.cars:
+                if car.id == carpool.OUR_SMART_CAR:
+                    car.location = node_finder(carpool.graph, pos.x, pos.y)   # set the ca
+                    car.visited.append(car.location)
+        time.sleep(0.005)
+
+
 
 
 carpool.graph = load_map()
 # Below is just placeholder content for testing purpose, this should be removed from final product.
-a = Car("Car 1", node_finder(carpool.graph, 0, 0))
+smart_car = Car(carpool.OUR_SMART_CAR, node_finder(carpool.graph, 0, 0))
 b = Car("Car 2", node_finder(carpool.graph, 1500, 200))
 c = Car("Car 3", node_finder(carpool.graph, 2000, 1000))
-carpool.cars.extend([a, b, c])
+carpool.cars.extend([smart_car, b, c])
 carpool.logic(node_finder(carpool.graph, 730, 1200), node_finder(carpool.graph, 2730, 100))
 
 # Makes sure the following only gets executed once
@@ -105,8 +125,9 @@ if __name__ == '__main__':
     t1 = Thread(target=start_flask)
     t2 = Thread(target=run_car_mover)
     t3 = Thread(target=run_simulator)
+    t4 = Thread(target=update_coordinates)
 
     t1.start()
     t2.start()
     t3.start()
-
+    t4.start()
