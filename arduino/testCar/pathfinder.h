@@ -15,7 +15,7 @@ static const double DEFAULT_THETA = 0.0;
 static const int MAX_PATH_LENGTH = 100;
 static const int BUFFER_SIZE = 64;
 
-static const int SCALE = 4;
+static const int SCALE = 6;
 
 class PathFinder {
 private:

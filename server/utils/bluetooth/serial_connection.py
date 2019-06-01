@@ -21,7 +21,6 @@ class SerialConnection():
 
         :param connection_type: parameter specifying whether to connect via 'bluetooth' or 'usb'
         """
-
         if connection_type not in ['bluetooth', 'usb']:
             raise Exception('Connection type \'' + connection_type + '\' is not supported')
 
@@ -51,6 +50,11 @@ class SerialConnection():
         return None
 
     def parse_telemetry(self):
+        """
+        Parse a command received and turn it into a coordinate if possible
+
+        :return: The coordinate parsed from the command stream
+        """
         telemetry = self.buffer
         self.buffer = ""
         if telemetry[0] == '<':

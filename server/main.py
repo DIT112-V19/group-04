@@ -99,6 +99,11 @@ def run_simulator():
 
 
 def update_coordinates():
+    """
+    Function used for reading the car's telemetry.
+
+    Infinite loop that needs to be executed in its own thread.
+    """
 
     # wait for the GUI to be loaded
     while not gui_loaded[0]:
@@ -120,7 +125,7 @@ def update_coordinates():
 
 
 carpool.graph = load_map()
-# Below is just placeholder content for testing purpose, this should be removed from final product.
+# Create test cars to simulate and demonstrate the functionality of the server
 smart_car = Car(carpool.OUR_SMART_CAR, node_finder(carpool.graph, 0, 0))
 b = Car("Car 2", node_finder(carpool.graph, 1500, 200))
 c = Car("Car 3", node_finder(carpool.graph, 2000, 1000))

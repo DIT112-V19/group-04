@@ -2,7 +2,7 @@ device_mac: "20:17:03:02:08:30"   # mac address of the bluetooth chip
 
 computers:
   edi:      # name of the used computer
-    usb: /dev/ttyACM1
+    usb: /dev/ttyACM0
     usb_port: 1
-    bluetooth: /dev/rfcomm5
+    bluetooth: /dev/rfcomm0
     bluetooth_port: 1
