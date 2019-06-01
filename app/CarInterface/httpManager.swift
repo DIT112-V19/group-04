@@ -13,7 +13,7 @@ class httpManager {
     
     static let shared = httpManager()
     init() {}
-    private let url = "https://loci.serveo.net/"
+    private let url = "https://carpool.serveo.net/"
     private let getCall = "api/getlocation"
     private let postCall = "api/pickup"
     private var car = carManager.shared
@@ -68,7 +68,7 @@ class httpManager {
         let p2 = tools.converter(location: user.theUser.destination)
         print("p1 >>\(p1)")
         print("p2 >>\(p2)")
-        let payLoad = PayLoad(location: tools.toArray(point: user.theUser.source), destination: tools.toArray(point: user.theUser.destination))
+        let payLoad = PayLoad(location: tools.toArray(point: p1), destination: tools.toArray(point: p2))
         print("payload >>",payLoad)
         let httpBody = try? jsonEncoder.encode(payLoad)
         print("http buddy",String(decoding: httpBody!, as: UTF8.self))
