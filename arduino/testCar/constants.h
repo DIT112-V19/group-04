@@ -1,7 +1,7 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#define DEBUG     // switch for debugging - comment out for the final product
+//#define DEBUG     // switch for debugging - comment out for the final product
 
 // ultra sound settings
 const int US_MAX_DISTANCE = 100;

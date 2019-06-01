@@ -13,7 +13,7 @@ import pickle
 app = Flask(__name__)
 bluetooth = SerialConnection('bluetooth')
 carpool = Carpool(bluetooth)
-
+gui_loaded = [False]
 
 
 @app.route('/api')
@@ -95,10 +95,22 @@ def run_car_mover():
 
 
 def run_simulator():
-    simulator.Simulator(carpool)
+    simulator.Simulator(carpool, gui_loaded)
 
 
 def update_coordinates():
+    """
+    Function used for reading the car's telemetry.
+
+    Infinite loop that needs to be executed in its own thread.
+    """
+
+    # wait for the GUI to be loaded
+    while not gui_loaded[0]:
+        pass
+
+    carpool.logic(node_finder(carpool.graph, 730, 1200), node_finder(carpool.graph, 2730, 100))
+    carpool.logic(node_finder(carpool.graph, 2070, 500), node_finder(carpool.graph, 30, 50))
 
     while True:
         pos = bluetooth.read()      # read all characters available via bluetooth
@@ -113,12 +125,11 @@ def update_coordinates():
 
 
 carpool.graph = load_map()
-# Below is just placeholder content for testing purpose, this should be removed from final product.
+# Create test cars to simulate and demonstrate the functionality of the server
 smart_car = Car(carpool.OUR_SMART_CAR, node_finder(carpool.graph, 0, 0))
 b = Car("Car 2", node_finder(carpool.graph, 1500, 200))
 c = Car("Car 3", node_finder(carpool.graph, 2000, 1000))
 carpool.cars.extend([smart_car, b, c])
-carpool.logic(node_finder(carpool.graph, 730, 1200), node_finder(carpool.graph, 2730, 100))
 
 # Makes sure the following only gets executed once
 if __name__ == '__main__':

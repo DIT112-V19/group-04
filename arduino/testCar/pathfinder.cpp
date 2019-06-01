@@ -79,12 +79,13 @@ void PathFinder::update() {
     }
   }
 
-  // calculate and share the current position if requested
+  #ifdef DEBUG
   if (mPublishPos == true) {
     updatePosition();
     publishPosition();
     mPublishPos = false;    
   }
+  #endif
 }
 
 /**
@@ -122,8 +123,8 @@ bool PathFinder::checkDist() {
     }
   } else {
     if (dist > US_SAFETY_DIST) {
-      if (mDestination != NULL) {
-        goToPoint(*mDestination);
+      if (mHasDestination) {
+        goToPoint(mDestination);
       }
       mProximityAlert = false;
     }
@@ -296,7 +297,10 @@ void PathFinder::moveForward(int distance) {
  * @param destination   The point which the PathFinder is supposed to go to
  */
 void PathFinder::goToPoint(Point destination) {
-  // First calculate angle and turn needed for this operation
+  mDestination = destination;
+  mHasDestination = true;
+  
+  // calculate angle and turn needed for this operation
   double dx = destination.getX() - mPos.getX();
   double dy = destination.getY() - mPos.getY();
   int targetHeading = (int) (atan2(dx, dy) * 180.0 / M_PI + 0.5);       // switch x and y to count clockwise from North
@@ -332,7 +336,7 @@ void PathFinder::clearPath() {
   }
   mReadPosition = 0;
   mWritePosition = 0;  
-  mDestination = NULL;
+  mHasDestination = false;
 }
 
 /**
@@ -359,11 +363,14 @@ void PathFinder::addPoint(const Point point) {
 void PathFinder::setNextGoal() {
   // check whether destinations are left unhandled and go there if so
   if (mReadPosition < mWritePosition && !mDrive && !mTurn) {
-    //println("Setting next goal!");
-   
-    *mDestination = mPath[mReadPosition];
+
+    #ifdef DEBUG
+    mConnection->println("Setting next goal!");
+    #endif
+    
+    Point point = mPath[mReadPosition];
     mReadPosition++;
-    goToPoint(*mDestination);
+    goToPoint(point);
   }
 }
 
