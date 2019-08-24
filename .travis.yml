@@ -1,0 +1,39 @@
+matrix:
+  include:
+
+    - language: python
+      python:
+       - "3.3"
+       - "3.4"
+       - "3.5"
+       - "3.6"
+      before_script:
+        - cd server/
+      install:
+        - pip install -r requirements.txt
+      script:
+        - python -m unittest discover
+        - python -m venv venv/bin/activate
+
+    - language: c
+      sudo: false
+      before_script:
+        - cd arduino
+      before_install:
+        - source <(curl -SLs https://raw.githubusercontent.com/adafruit/travis-ci-arduino/master/install.sh)
+      cache:
+        directories:
+         - ~/arduino_ide
+         - ~/.arduino15/packages/
+      install:
+        - arduino --install-library "Adafruit ILI9341","Adafruit GFX Library"
+      script:
+        - build_main_platforms
+
+
+    - language: Swift
+      osx_image: xcode10.3
+      before_script:
+        - cd app
+      script:
+        - xcodebuild clean test -project CarInterface.xcodeproj -scheme CarInterface -destination "platform=iOS Simulator,name=iPhone 7,OS=10.3" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO -quiet
