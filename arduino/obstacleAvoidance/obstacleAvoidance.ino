@@ -1,7 +1,7 @@
 // very basic obstacle avoidance
 // stop the car when an obstacle gets to close to the front sensor
 
-
+#include <Smartcar.h>
 #include "constants.h"
 #include <SoftwareSerial.h>
 
