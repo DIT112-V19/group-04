@@ -2,16 +2,15 @@ matrix:
   include:
 
     - language: python
-      python:
-       - "3.3"
-       - "3.4"
-       - "3.5"
-       - "3.6"
+     python:
+      - "3.4"
+
       before_script:
         - cd server/
       install:
         - pip install -r requirements.txt
       script:
+        - pytest
         - python -m unittest discover
         - python -m venv venv/bin/activate
 
@@ -31,9 +30,7 @@ matrix:
         - build_main_platforms
 
 
-    - language: Swift
-      osx_image: xcode10.3
-      before_script:
-        - cd app
-      script:
-        - xcodebuild clean test -project CarInterface.xcodeproj -scheme CarInterface -destination "platform=iOS Simulator,name=iPhone 7,OS=10.3" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO -quiet
+    - language: swift
+      xcode_project: CarInterface.xcodeproj
+      xcode_scheme: CarInterfaceTests
+      xcode_destination: platform=iOS Simulator,OS=10.1,name=iPad Pro (9.7-inch)
