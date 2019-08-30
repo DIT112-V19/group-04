@@ -32,8 +32,8 @@ matrix:
         - build_main_platforms
 
 
-    - os: osx
-      language: swift
+    - language: swift
+      os: osx
       osx_image: xcode10.3
       before_script:
         - cd app
