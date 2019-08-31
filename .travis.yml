@@ -28,8 +28,8 @@ deploy:
   api_key:
     secure: bdeac7bd7ffa0b46a10afbc198cdd6254d2cc6d1
   file:
-    - /arduino/testCar/testCar.ino.with_bootloader.mega.hex
-    - /arduino/testCar/testCar.ino.mega.hex
+    - $TRAVIS_BUILD_DIR/arduino/testCar/testCar.ino.with_bootloader.mega.hex
+    - $TRAVIS_BUILD_DIR/arduino/testCar/testCar.ino.mega.hex
   skip_cleanup: true
   on:
     tags: true
