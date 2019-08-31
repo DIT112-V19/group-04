@@ -24,7 +24,7 @@ matrix:
      - ~/arduino_ide
      - ~/.arduino15/packages/
     install:
-     - arduino --install-library "Adafruit ILI9341", "Adafruit GFX Library"
+     - arduino --install-library "Adafruit ILI9341","Adafruit GFX Library"
      - arduino --install-library "Smartcar shield"
     script:
      - build_main_platforms
@@ -36,4 +36,4 @@ matrix:
     before_script:
      - cd app
     script:
-     - xcodebuild clean test -project CarInterface.xcodeproj -scheme CarInterface -destination "platform=iOS Simulator,name=iPhone 7, OS=11.4" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
+     - xcodebuild clean test -project CarInterface.xcodeproj -scheme CarInterface -destination "platform=iOS Simulator,name=iPhone 7,OS=11.4" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
