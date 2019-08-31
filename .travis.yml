@@ -28,7 +28,8 @@ deploy:
   api_key:
     secure: bdeac7bd7ffa0b46a10afbc198cdd6254d2cc6d1
   file:
-    - cd arduino/
+    - /var/folders/5l/19q2t_7x6sz3t8x66_kqgq040000gn/T/arduino_build_262867/sketch/obstacleAvoidance.ino.cpp.o
+    - /var/folders/5l/19q2t_7x6sz3t8x66_kqgq040000gn/T/arduino_build_277567/sketch/pathfinder.cpp.o
   skip_cleanup: true
   on:
     tags: true
