@@ -28,8 +28,8 @@ deploy:
   api_key:
     secure: bdeac7bd7ffa0b46a10afbc198cdd6254d2cc6d1
   file:
-    - /var/folders/5l/19q2t_7x6sz3t8x66_kqgq040000gn/T/arduino_build_262867/obstacleAvoidance.ino.hex
-    - /var/folders/5l/19q2t_7x6sz3t8x66_kqgq040000gn/T/arduino_build_277567/testCar.ino.hex
+    - /arduino/testCar/testCar.ino.with_bootloader.mega.hex
+    - /arduino/testCar/testCar.ino.mega.hex
   skip_cleanup: true
   on:
     tags: true
