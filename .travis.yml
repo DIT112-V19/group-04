@@ -1,39 +1,24 @@
 matrix:
   include:
+    - language: python
+      python: 3.6
+      before_install:
+        - cd server/
+      install:
+        - pip install -r requirements.txt
+      script:
+        - python -m py_compile main.py
 
-  -language: python
-   python:
-    - "3.4"
-   before_script:
-    - cd server/
-   install:
-    - pip install -r requirements.txt
-   script:
-    - pytest
-    - python -m unittest discover
-    - python -m venv venv/bin/activate
-
-  - language: c
-    sudo: false
-    before_script:
-     - cd arduino/
-    before_install:
-     - source <(curl -SLs https://raw.githubusercontent.com/adafruit/travis-ci-arduino/master/install.sh)
+    - language: c
+      before_script:
+        - cd arduino/
+      before_install:
+        - source <(curl -SLs https://raw.githubusercontent.com/adafruit/travis-ci-arduino/master/install.sh)
+      install:
+        - arduino --install-library "Smartcar shield"
+      script:
+        - build_platform mega2560
       cache:
-    directories:
-     - ~/arduino_ide
-     - ~/.arduino15/packages/
-    install:
-     - arduino --install-library "Adafruit ILI9341","Adafruit GFX Library"
-     - arduino --install-library "Smartcar shield"
-    script:
-     - build_main_platforms
-
-
-  - language: swift
-    osx_image: xcode10.3
-    os: osx
-    before_script:
-     - cd app
-    script:
-     - xcodebuild clean test -project CarInterface.xcodeproj -scheme CarInterface -destination "platform=iOS Simulator,name=iPhone 7,OS=11.4" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
+        directories:
+          - ~/arduino_ide
+          - ~/.arduino15/packages/
