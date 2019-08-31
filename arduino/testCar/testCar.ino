@@ -15,7 +15,7 @@ SR04 frontUltrasound(US_TRIGGER_PIN, US_ECHO_PIN, US_MAX_DISTANCE);   // ultra s
 
 // HeadingCar and PathFinder derived from it
 HeadingCar car(control, gyroscope);
-PathFinder pathy(car, &Serial, &leftOdometer, &rightOdometer, &frontUltrasound, Point(30, 2));
+PathFinder pathy(car, &Serial3, &leftOdometer, &rightOdometer, &frontUltrasound, Point(30, 2));
 
 // variable to store the time at program start in ms
 unsigned long startTime;
