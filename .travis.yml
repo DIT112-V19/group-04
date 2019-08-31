@@ -27,8 +27,7 @@ matrix:
      - arduino --install-library "Adafruit ILI9341", "Adafruit GFX Library"
      - arduino --install-library "Smartcar shield"
     script:
-     - build_main_platforms
-
+    - build_platform mega2560
 
   - language: swift
     osx_image: xcode10.3
