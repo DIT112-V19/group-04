@@ -24,7 +24,7 @@ int speed = STOP_SPEED;
 
 String buffer = "";
 
-HardwareSerial connection = Serial;
+HardwareSerial connection = Serial1;
 
 void setup() {
   // initialize serial communication
