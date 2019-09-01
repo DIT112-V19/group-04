@@ -26,7 +26,7 @@ matrix:
 deploy:
   provider: releases
   api_key:
-    secure: bdeac7bd7ffa0b46a10afbc198cdd6254d2cc6d1
+    secure: "EWEbN6iiVp0zKqkJJuqxu0OMlJlb2hLdYMfUDAu6zpeY58DI/C7thQFJoea+xhCpfKUybxktQpggmljLw1yf9a0d2qr9+LkniVWDR+N8pmgPZmksFTCoWtqoBYp4X6hG/2rUSrL6vhnZXsgOsVWlEZ77WJUXaum1mglLrPaqRntNX4YwSsG5cb+967lAw0BEz+V9eIdrhN2tVRpR49uDoo5sywLbmoqfGRn+TYqtfZFvuM549pWc1gWhV0y7IbQMeAw5FFiF9NHVHpwOhMW7qcANSH5XQbSX/U06avrFD8jtQriFgk7deZkIhsNcHgULXv6J85o2PG//GpZOUXVDhdPEG96R4nUFajrPtRXeCKccD1P9zFks1fIwKrsFRMAkm/XudvDaG73eTguIVOIQ0qSK8Xj49ch+yDoNOXac3oqFT/atFI+p0Z1RGbi9BnKMc6lIkfYraLwNQL+pBaxPREoJKPB89ha3+aVcJaR3QwBOgUMndEWVxMaGZC00OTzjF7VCqDuHq6rr400zjPsE759ATH1eGcuqcaZaWPG568c64IbLkuZvmi3HfxL1ozKTjCRABh7a50axx0QfnP11hgLJ1akO7h2Oh+RSUS2mBBwH55rPNf6jtZ/gE1kgyCHShUFX7bAQW8EGYjzy62fpT5z6biHJ1Tn75eaRb0O0TYA="
   file:
     - $ARDUINO_HEX_DIR/mega2560/testCar/testCar.ino.hex
     - $ARDUINO_HEX_DIR/mega2560/testCar/testCar.ino.with_bootloader.hex
