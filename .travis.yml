@@ -13,7 +13,7 @@ matrix:
       before_script:
         - cd arduino/
       before_install:
-        - source <(curl -SLs https://raw.githubusercontent.com/adafruit/travis-ci-arduino/master/install.sh)
+        - source <(curl -SLs https://raw.githubusercontent.com/platisd/travis-ci-arduino/master/install.sh)
       install:
         - arduino --install-library "Smartcar shield"
       script:
@@ -28,8 +28,10 @@ deploy:
   api_key:
     secure: bdeac7bd7ffa0b46a10afbc198cdd6254d2cc6d1
   file:
-    - "$TRAVIS_BUILD_DIR/arduino/testCar/testCar.ino.with_bootloader.mega.hex"
-    - "$TRAVIS_BUILD_DIR/arduino/testCar/testCar.ino.mega.hex"
+    - $ARDUINO_HEX_DIR/mega2560/testCar/testCar.ino.hex
+    - $ARDUINO_HEX_DIR/mega2560/testCar/testCar.ino.with_bootloader.hex
+    - $ARDUINO_HEX_DIR/mega2560/obstacleAvoidance/obstacleAvoidance.ino.hex
+    - $ARDUINO_HEX_DIR/mega2560/obstacleAvoidance/obstacleAvoidance.ino.with_bootloader.hex
   skip_cleanup: true
   on:
     tags: true
