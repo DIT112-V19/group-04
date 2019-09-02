@@ -3,13 +3,12 @@ matrix:
   - language: python
     python: 3.6
     before_install:
+    - openssl aes-256-cbc -K $encrypted_a32d2c3e115d_key -iv $encrypted_a32d2c3e115d_iv -in github_deploy_key.enc -out github_deploy_key -d
     - cd server/
     install:
     - pip install -r requirements.txt
     script:
     - python -m py_compile main.py
-
-
   - language: c
     before_script:
     - cd arduino/
@@ -23,11 +22,8 @@ matrix:
       directories:
       - "~/arduino_ide"
       - "~/.arduino15/packages/"
-
 deploy:
   provider: releases
-  api_key:
-    secure: $GITHUB_TOKEN
   file:
   - "$ARDUINO_HEX_DIR/mega2560/testCar/testCar.ino.hex"
   - "$ARDUINO_HEX_DIR/mega2560/testCar/testCar.ino.with_bootloader.hex"
@@ -36,4 +32,6 @@ deploy:
   skip_cleanup: true
   on:
     tags: true
-
+env:
+  global:
+    secure: "b0eG/pj32YH9stQEv6wsQEcT9r16qli3HjcN9ugdLftt1UpEVfminB/zfTuHTcBsmmYZtqSj4M3KlcuFZqK0F8CEtx6+ye8BcHB6ztcrgupLme1uQxKcGSHW+yF/duMZHF5kNT58b53k7m196qEy5qVIWayQR6Zpp4V3LKtmBMamBteBMekIgrwB6hGu3ImShiio4lmrJ9A45WMsUBxoxJ2yEcHnjwrUW1CWN44l9JZ1qZyUr0dw2obbcFm0ymKSoaw5lERm1cshDu/Cw8dqMsCuNsxRcpxzO5LwJyNby8VNnkZrwR5TJnoKcV2I5m6cpEq2CYjurt3iU7PozC7NK91cEyYg2ZyJwDrdfANrDg5dNyMGQCg5kXiUmaRdmEGm3vg3JN7bhIxkfql/ykbGKazZWW8md+wFrkeFQhgpDabFDg/7w3oeQZfVWoPXR2Wt0ZWLknGhtf4ltymXq2mHmTdXtUQMA172ye1TEIRZU5SbcBeNne8EXNlYSUwQLXwYIiGHIRtSkuDbZZkC3aklEn3PPB3UtSAM5xMdOYlggBOFEquM7pb3+uLpmKS4rZtLat85WsXBDivgjuEA+3X9kopUXSBNZ7QBYYImL4SohiX9YhvBY5eq7Dh+Wv2KQe5Y/1e7fio6tjAaLqPyLaTJUGe+hhkvhHzd083fE25DWag="
