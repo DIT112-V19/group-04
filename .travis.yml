@@ -9,6 +9,7 @@ matrix:
     script:
     - python -m py_compile main.py
 
+
   - language: c
     before_script:
     - cd arduino/
@@ -25,13 +26,8 @@ matrix:
 
 deploy:
   provider: releases
-  env:
-   global:
-     secure: jzy09jf/I3VRwjNj5WVoiRKnuK3T21yRN9rg3OgKAXP7UWGeKqK/ZZivq/fn63bQ/M4QAY2uB54Y5MXPqDPpoUHe40iXqOrhpqmJGgX58n0ZCY/UMTbhYnwb+UiB23wCQklGtaDEr6ao4LmZrhhIVEblHBZZ1lD57S1FPvIo1RfwrAWhSum6Lox5/atX31VugwJrISld/DKPmwwRvU5kkyjJKrAUwygL61lEbaD/geizIaXy5DJSChNDqaA/5qOftaNmyZdhf7DVbWAxb07SNo0WnNsarcaORY1qU1SdkIfAQl9g8uF1x/KagvZUxiRCfdPpWosJTRkWCAEKfaxyvAQgtrIWtk8Jmg8zGFvN6UH8HKytD3xquCK6sZOyUq5K3GGc3VZAQ5Jc0Ruve4C9w8UAUj9CkE1tuT3rUVoF9zCCeYf4MCJpyl4y03egotOVvqBxKETdPZc0hQTOFNGyMQkuHiuVSIIkmmxLFDUfu3IU6vKXba445U+B+MHHDrEMByY0ezaZFh9vXTtPkWpBy5Sxk1AvtQuFrttw1NCrTBasTbEXCtJ9T1bbCQpDmVgVgnX5RZKHL+IhCsB3nQgkDrmvGkayd7q//xc8zDCEvWuzeo7RIFoSMgRzR76jpiVRxj6pu0DvC0NljOJg73ZGRr1+52UUThp7GjJ/OahEfOA=
-before_install:
-  - composer config --global github-oauth.github.com "$GITHUB_TOKEN"
-install:
-  - composer install --dev --prefer-dist
+  api_key:
+    secure: $GITHUB_TOKEN
   file:
   - "$ARDUINO_HEX_DIR/mega2560/testCar/testCar.ino.hex"
   - "$ARDUINO_HEX_DIR/mega2560/testCar/testCar.ino.with_bootloader.hex"
