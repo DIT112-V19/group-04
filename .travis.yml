@@ -3,7 +3,6 @@ matrix:
   - language: python
     python: 3.6
     before_install:
-    - openssl aes-256-cbc -K $encrypted_a32d2c3e115d_key -iv $encrypted_a32d2c3e115d_iv -in github_deploy_key.enc -out github_deploy_key -d
     - cd server/
     install:
     - pip install -r requirements.txt
