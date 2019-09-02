@@ -1,37 +1,38 @@
 matrix:
   include:
-    - language: python
-      python: 3.6
-      before_install:
-        - cd server/
-      install:
-        - pip install -r requirements.txt
-      script:
-        - python -m py_compile main.py
-
-    - language: c
-      before_script:
-        - cd arduino/
-      before_install:
-        - source <(curl -SLs https://raw.githubusercontent.com/adafruit/travis-ci-arduino/master/install.sh)
-      install:
-        - arduino --install-library "Smartcar shield"
-      script:
-        - build_platform mega2560
-      cache:
-        directories:
-          - ~/arduino_ide
-          - ~/.arduino15/packages/
-
+  - language: python
+    python: 3.6
+    before_install:
+    - cd server/
+    install:
+    - pip install -r requirements.txt
+    script:
+    - python -m py_compile main.py
+  - language: c
+    before_script:
+    - cd arduino/
+    before_install:
+    - source <(curl -SLs https://raw.githubusercontent.com/adafruit/travis-ci-arduino/master/install.sh)
+    install:
+    - arduino --install-library "Smartcar shield"
+    script:
+    - build_platform mega2560
+    cache:
+      directories:
+      - "~/arduino_ide"
+      - "~/.arduino15/packages/"
 deploy:
   provider: releases
   api_key:
-    secure: "EWEbN6iiVp0zKqkJJuqxu0OMlJlb2hLdYMfUDAu6zpeY58DI/C7thQFJoea+xhCpfKUybxktQpggmljLw1yf9a0d2qr9+LkniVWDR+N8pmgPZmksFTCoWtqoBYp4X6hG/2rUSrL6vhnZXsgOsVWlEZ77WJUXaum1mglLrPaqRntNX4YwSsG5cb+967lAw0BEz+V9eIdrhN2tVRpR49uDoo5sywLbmoqfGRn+TYqtfZFvuM549pWc1gWhV0y7IbQMeAw5FFiF9NHVHpwOhMW7qcANSH5XQbSX/U06avrFD8jtQriFgk7deZkIhsNcHgULXv6J85o2PG//GpZOUXVDhdPEG96R4nUFajrPtRXeCKccD1P9zFks1fIwKrsFRMAkm/XudvDaG73eTguIVOIQ0qSK8Xj49ch+yDoNOXac3oqFT/atFI+p0Z1RGbi9BnKMc6lIkfYraLwNQL+pBaxPREoJKPB89ha3+aVcJaR3QwBOgUMndEWVxMaGZC00OTzjF7VCqDuHq6rr400zjPsE759ATH1eGcuqcaZaWPG568c64IbLkuZvmi3HfxL1ozKTjCRABh7a50axx0QfnP11hgLJ1akO7h2Oh+RSUS2mBBwH55rPNf6jtZ/gE1kgyCHShUFX7bAQW8EGYjzy62fpT5z6biHJ1Tn75eaRb0O0TYA="
+    secure: $GITHUB_TOKEN
   file:
-    - $ARDUINO_HEX_DIR/mega2560/testCar/testCar.ino.hex
-    - $ARDUINO_HEX_DIR/mega2560/testCar/testCar.ino.with_bootloader.hex
-    - $ARDUINO_HEX_DIR/mega2560/obstacleAvoidance/obstacleAvoidance.ino.hex
-    - $ARDUINO_HEX_DIR/mega2560/obstacleAvoidance/obstacleAvoidance.ino.with_bootloader.hex
+  - "$ARDUINO_HEX_DIR/mega2560/testCar/testCar.ino.hex"
+  - "$ARDUINO_HEX_DIR/mega2560/testCar/testCar.ino.with_bootloader.hex"
+  - "$ARDUINO_HEX_DIR/mega2560/obstacleAvoidance/obstacleAvoidance.ino.hex"
+  - "$ARDUINO_HEX_DIR/mega2560/obstacleAvoidance/obstacleAvoidance.ino.with_bootloader.hex"
   skip_cleanup: true
   on:
     tags: true
+env:
+  global:
+    secure: "b0eG/pj32YH9stQEv6wsQEcT9r16qli3HjcN9ugdLftt1UpEVfminB/zfTuHTcBsmmYZtqSj4M3KlcuFZqK0F8CEtx6+ye8BcHB6ztcrgupLme1uQxKcGSHW+yF/duMZHF5kNT58b53k7m196qEy5qVIWayQR6Zpp4V3LKtmBMamBteBMekIgrwB6hGu3ImShiio4lmrJ9A45WMsUBxoxJ2yEcHnjwrUW1CWN44l9JZ1qZyUr0dw2obbcFm0ymKSoaw5lERm1cshDu/Cw8dqMsCuNsxRcpxzO5LwJyNby8VNnkZrwR5TJnoKcV2I5m6cpEq2CYjurt3iU7PozC7NK91cEyYg2ZyJwDrdfANrDg5dNyMGQCg5kXiUmaRdmEGm3vg3JN7bhIxkfql/ykbGKazZWW8md+wFrkeFQhgpDabFDg/7w3oeQZfVWoPXR2Wt0ZWLknGhtf4ltymXq2mHmTdXtUQMA172ye1TEIRZU5SbcBeNne8EXNlYSUwQLXwYIiGHIRtSkuDbZZkC3aklEn3PPB3UtSAM5xMdOYlggBOFEquM7pb3+uLpmKS4rZtLat85WsXBDivgjuEA+3X9kopUXSBNZ7QBYYImL4SohiX9YhvBY5eq7Dh+Wv2KQe5Y/1e7fio6tjAaLqPyLaTJUGe+hhkvhHzd083fE25DWag="
