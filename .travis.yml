@@ -13,7 +13,7 @@ matrix:
       before_script:
         - cd arduino/
       before_install:
-        - source <(curl -SLs https://raw.githubusercontent.com/platisd/travis-ci-arduino/master/install.sh)
+        - source <(curl -SLs https://raw.githubusercontent.com/adafruit/travis-ci-arduino/master/install.sh)
       install:
         - arduino --install-library "Smartcar shield"
       script:
