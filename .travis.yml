@@ -23,6 +23,8 @@ matrix:
       - "~/.arduino15/packages/"
 deploy:
   provider: releases
+  api_key:
+    secure: GITHUB_TOKEN
   file:
   - "$ARDUINO_HEX_DIR/mega2560/testCar/testCar.ino.hex"
   - "$ARDUINO_HEX_DIR/mega2560/testCar/testCar.ino.with_bootloader.hex"
